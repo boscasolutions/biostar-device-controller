@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Platforms>AnyCPU;x86;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Suprema.Common\Suprema.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="lib\x64\BS_SDK_V2_x64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="lib\x64\libcrypto-1_1-x64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="lib\x64\libssl-1_1-x64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="lib\x86\BS_SDK_V2_x86.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="lib\x86\libcrypto-1_1.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="lib\x86\libssl-1_1.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+	<Target Name="CopyDLLs" AfterTargets="Build">
+		<Message Text="Executing CopyDLLs task" Importance="High" />
+
+		<Copy SourceFiles="$(TargetDir)\lib\$(PlatformName)\BS_SDK_V2_$(PlatformName).dll" DestinationFiles="$(TargetDir)BS_SDK_V2.dll" />
+		<Copy Condition="$(Platform)=='x86'" SourceFiles="$(TargetDir)\lib\$(PlatformName)\libssl-1_1.dll" DestinationFolder="$(TargetDir)" />
+		<Copy Condition="$(Platform)=='x86'" SourceFiles="$(TargetDir)\lib\$(PlatformName)\libcrypto-1_1.dll" DestinationFolder="$(TargetDir)" />
+		<Copy Condition="$(Platform)=='x64'" SourceFiles="$(TargetDir)\lib\$(PlatformName)\libssl-1_1-x64.dll" DestinationFolder="$(TargetDir)" />
+		<Copy Condition="$(Platform)=='x64'" SourceFiles="$(TargetDir)\lib\$(PlatformName)\libcrypto-1_1-x64.dll" DestinationFolder="$(TargetDir)" />
+
+		<Message Text="CopyDLLs task completed" Importance="High" />
+	</Target>
+</Project>
