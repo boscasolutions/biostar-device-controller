@@ -1,9 +1,8 @@
-using System;
 using Gsdk.Connect;
 
 namespace example
 {
-  class MainMenu {
+  public class MainMenu {
     private Menu menu;
     private ConnectSvc connectSvc;
     private DeviceMenu deviceMenu;

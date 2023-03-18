@@ -1,5 +1,4 @@
 using System;
-using Event;
 
 namespace example
 {

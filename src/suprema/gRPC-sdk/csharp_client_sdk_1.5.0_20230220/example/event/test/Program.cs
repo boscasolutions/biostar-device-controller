@@ -1,6 +1,4 @@
 using System;
-using Connect;
-using Event;
 using Grpc.Core;
 
 namespace example
@@ -8,12 +6,12 @@ namespace example
   class EventTest
   {
     private const string GATEWAY_CA_FILE = "../../../../cert/gateway/ca.crt";
-    private const string GATEWAY_ADDR = "192.168.0.2";
+    private const string GATEWAY_ADDR = "localhost";
     private const int GATEWAY_PORT = 4000;
 
-    private const string DEVICE_ADDR = "192.168.0.110";
+    private const string DEVICE_ADDR = "192.168.1.74";
     private const int DEVICE_PORT = 51211;
-    private const bool USE_SSL = false;        
+    private const bool USE_SSL = true;        
 
     private GatewayClient gatewayClient;
     private ConnectSvc connectSvc;

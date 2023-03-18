@@ -10,20 +10,11 @@ namespace example
         private const string GATEWAY_ADDR = "localhost";
 		private const int GATEWAY_PORT = 4000;
 
-		private const string MASTER_CA_FILE = "../../../cert/master/ca.crt";
-		private const string MASTER_ADDR = "192.168.8.54";
-		private const int MASTER_PORT = 4010;
-		private const string TENANT_CERT_FILE = "../../../cert/master/tenant1.crt";
-		private const string TENANT_KEY_FILE = "../../../cert/master/tenant1_key.pem";
-		private const string ADMIN_CERT_FILE = "../../../cert/master/admin.crt";
-		private const string ADMIN_KEY_FILE = "../../../cert/master/admin_key.pem";
-
-		private const string TENANT_ID = "tenant1";
 		private const string GATEWAY_ID = "gateway1";
 
-		private const string DEVICE_ADDR = "192.168.1.100";
+		private const string DEVICE_ADDR = "192.168.1.74";
 		private const int DEVICE_PORT = 51211;
-		private const bool USE_SSL = false;
+		private const bool USE_SSL = true;
 
 		private GrpcClient grpcClient;
 		private ConnectSvc connectSvc;
@@ -61,13 +52,6 @@ namespace example
 					Grpc.Core.GrpcEnvironment.SetLogger(new Grpc.Core.Logging.ConsoleLogger());
 				}
 
-				if(args[i].Equals("-mi")) {
-					var masterClient = new MasterClient();
-					masterClient.ConnectAdmin(MASTER_CA_FILE, ADMIN_CERT_FILE, ADMIN_KEY_FILE, MASTER_ADDR, MASTER_PORT);
-					masterClient.InitTenant(TENANT_ID, GATEWAY_ID);
-
-					return;
-				}
 
 				if(args[i].Equals("-m")) {
 					masterMode = true;
@@ -78,15 +62,9 @@ namespace example
 			GrpcClient client = null;
 
 			try {
-				if(masterMode) {
-					var masterClient = new MasterClient();
-					masterClient.ConnectTenant(MASTER_CA_FILE, TENANT_CERT_FILE, TENANT_KEY_FILE, MASTER_ADDR, MASTER_PORT);
-					client = masterClient; 
-				} else {
-					var gatewayClient = new GatewayClient();
-					gatewayClient.Connect(GATEWAY_CA_FILE, GATEWAY_ADDR, GATEWAY_PORT); 
-					client = gatewayClient; 
-				}
+				var gatewayClient = new GatewayClient();
+				gatewayClient.Connect(GATEWAY_CA_FILE, GATEWAY_ADDR, GATEWAY_PORT);
+				client = gatewayClient; 
 			} catch (RpcException e) {
 				Console.WriteLine("Cannot connect to the gateway: {0}", e);
 				Environment.Exit(1);
