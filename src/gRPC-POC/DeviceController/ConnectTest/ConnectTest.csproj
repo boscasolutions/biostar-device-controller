@@ -10,9 +10,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Client\Client.csproj" />
     <ProjectReference Include="..\Cli\Cli.csproj" />
     <ProjectReference Include="..\ConnectService\ConnectService.csproj" />
+    <ProjectReference Include="..\GatewayClient\GatewayClient.csproj" />
   </ItemGroup>
 
 

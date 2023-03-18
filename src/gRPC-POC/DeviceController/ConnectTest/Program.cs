@@ -1,76 +1,90 @@
-﻿using System;
-using System.Threading;
+﻿using Grpc.Core;
 using Gsdk.Connect;
-using Grpc.Core;
+using System;
+using System.Threading;
 
 namespace example
 {
-  class ConnectTest
-  {
-    private const string GATEWAY_CA_FILE = "../../../../cert/ca.crt";
-    private const string GATEWAY_ADDR = "localhost";
-    private const int GATEWAY_PORT = 4000;
-
-    private const int STATUS_QUEUE_SIZE = 16;
-
-    private GatewayClient gatewayClient;
-    private ConnectSvc connectSvc;
-
-    public ConnectSvc GetConnectSvc() {
-      return connectSvc;
-    }
-
-    public ConnectTest(GatewayClient client) {
-      gatewayClient = client;
-
-      connectSvc = new ConnectSvc(gatewayClient.GetChannel());
-    }
-
-    public CancellationTokenSource SubscribeDeviceStatus() {
-      var devStatusStream = connectSvc.Subscribe(STATUS_QUEUE_SIZE);
-  
-      CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-
-      ReceiveStatus(devStatusStream, cancellationTokenSource.Token);
-
-      return cancellationTokenSource;
-    }
-
-    public static void Main(string[] args)
+    class ConnectTest
     {
-      var gatewayClient = new GatewayClient();
-      gatewayClient.Connect(GATEWAY_CA_FILE, GATEWAY_ADDR, GATEWAY_PORT);
+        private const string GATEWAY_CA_FILE = "../../../../cert/ca.crt";
+        private const string GATEWAY_ADDR = "localhost";
+        private const int GATEWAY_PORT = 4000;
 
-      var connectTest = new ConnectTest(gatewayClient);
+        private const int STATUS_QUEUE_SIZE = 16;
 
-      var tokenSource = connectTest.SubscribeDeviceStatus();
+        private GatewayClient gatewayClient;
+        private ConnectSvc connectSvc;
 
-      MainMenu mainMenu = new MainMenu(connectTest.GetConnectSvc());
-      mainMenu.Show();
-
-      tokenSource.Cancel();
-      gatewayClient.Close();
-    }
-
-    static async void ReceiveStatus(IAsyncStreamReader<StatusChange> stream, CancellationToken token) {
-      Console.WriteLine("Start receiving device status");
-
-      try {
-        while(await stream.MoveNext(token)) {
-          var statusChange = stream.Current;
-          if(statusChange.Status != Gsdk.Connect.Status.TlsNotAllowed && statusChange.Status != Gsdk.Connect.Status.TcpNotAllowed) {
-            Console.WriteLine("\n\nStatus: {0}\n", statusChange);        
-          }
+        public ConnectSvc GetConnectSvc()
+        {
+            return connectSvc;
         }
-      } catch (RpcException e) {
-        if(e.StatusCode == StatusCode.Cancelled) {
-          Console.WriteLine("Monitoring is cancelled");
-        } else {
-          Console.WriteLine("Monitoring error: {0}", e);
+
+        public ConnectTest(GatewayClient client)
+        {
+            gatewayClient = client;
+
+            connectSvc = new ConnectSvc(gatewayClient.GetChannel());
         }
-      } finally {
-        Console.WriteLine("Stop receiving device status");
-      }
+
+        public CancellationTokenSource SubscribeDeviceStatus()
+        {
+            var devStatusStream = connectSvc.Subscribe(STATUS_QUEUE_SIZE);
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+
+            ReceiveStatus(devStatusStream, cancellationTokenSource.Token);
+
+            return cancellationTokenSource;
+        }
+
+        public static void Main(string[] args)
+        {
+            var gatewayClient = new GatewayClient();
+            gatewayClient.Connect(GATEWAY_CA_FILE, GATEWAY_ADDR, GATEWAY_PORT);
+
+            var connectTest = new ConnectTest(gatewayClient);
+
+            var tokenSource = connectTest.SubscribeDeviceStatus();
+
+            MainMenu mainMenu = new MainMenu(connectTest.GetConnectSvc());
+            mainMenu.Show();
+
+            tokenSource.Cancel();
+            gatewayClient.Close();
+        }
+
+        static async void ReceiveStatus(IAsyncStreamReader<StatusChange> stream, CancellationToken token)
+        {
+            Console.WriteLine("Start receiving device status");
+
+            try
+            {
+                while (await stream.MoveNext(token))
+                {
+                    var statusChange = stream.Current;
+                    if (statusChange.Status != Gsdk.Connect.Status.TlsNotAllowed && statusChange.Status != Gsdk.Connect.Status.TcpNotAllowed)
+                    {
+                        Console.WriteLine("\n\nStatus: {0}\n", statusChange);
+                    }
+                }
+            }
+            catch (RpcException e)
+            {
+                if (e.StatusCode == StatusCode.Cancelled)
+                {
+                    Console.WriteLine("Monitoring is cancelled");
+                }
+                else
+                {
+                    Console.WriteLine("Monitoring error: {0}", e);
+                }
+            }
+            finally
+            {
+                Console.WriteLine("Stop receiving device status");
+            }
+        }
     }
-  }
 }

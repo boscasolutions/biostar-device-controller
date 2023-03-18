@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Grpc" Version="1.17.0" />
+    <PackageReference Include="System.Text.Json" Version="4.7.2" />  
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CardService\CardService.csproj" />
+    <ProjectReference Include="..\Cli\Cli.csproj" />
+    <ProjectReference Include="..\ConnectService\ConnectService.csproj" />
+    <ProjectReference Include="..\EventService\EventService.csproj" />
+    <ProjectReference Include="..\GatewayClient\GatewayClient.csproj" />
+    <ProjectReference Include="..\UserService\UserService.csproj" />
+  </ItemGroup>
+
+</Project>
