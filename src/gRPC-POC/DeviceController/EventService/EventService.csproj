@@ -7,7 +7,7 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\ProtoClient\ProtoClient.csproj" />
+		<ProjectReference Include="..\ProtoClient\SupremaServices.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

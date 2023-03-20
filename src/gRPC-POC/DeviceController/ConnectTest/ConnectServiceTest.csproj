@@ -13,6 +13,7 @@
     <ProjectReference Include="..\Cli\Cli.csproj" />
     <ProjectReference Include="..\ConnectService\ConnectService.csproj" />
     <ProjectReference Include="..\GatewayClient\GatewayClient.csproj" />
+    <ProjectReference Include="..\StatusService\StatusService.csproj" />
   </ItemGroup>
 
 
