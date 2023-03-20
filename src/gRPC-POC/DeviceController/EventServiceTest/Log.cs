@@ -6,7 +6,7 @@ namespace example
     public class LogTest
     {
         private const int MAX_NUM_EVENT = 32;
-        private const string CODE_MAP_FILE = "../../event/event_code.json";
+        private const string CODE_MAP_FILE = "./event_code.json";
 
         private EventSvc eventSvc;
         private uint firstEventID;

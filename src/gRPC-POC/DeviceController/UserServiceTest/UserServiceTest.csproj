@@ -11,14 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AuthService\AuthService.csproj" />
-    <ProjectReference Include="..\CardService\CardService.csproj" />
     <ProjectReference Include="..\Cli\Cli.csproj" />
     <ProjectReference Include="..\ConnectService\ConnectService.csproj" />
     <ProjectReference Include="..\DviceService\DviceService.csproj" />
     <ProjectReference Include="..\EventService\EventService.csproj" />
     <ProjectReference Include="..\FaceService\FaceService.csproj" />
-    <ProjectReference Include="..\FingerService\FingerService.csproj" />
     <ProjectReference Include="..\GatewayClient\GatewayClient.csproj" />
     <ProjectReference Include="..\UserService\UserService.csproj" />
   </ItemGroup>

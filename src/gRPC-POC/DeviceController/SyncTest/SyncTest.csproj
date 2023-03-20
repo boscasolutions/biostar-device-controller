@@ -11,7 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CardService\CardService.csproj" />
     <ProjectReference Include="..\Cli\Cli.csproj" />
     <ProjectReference Include="..\ConnectService\ConnectService.csproj" />
     <ProjectReference Include="..\EventService\EventService.csproj" />

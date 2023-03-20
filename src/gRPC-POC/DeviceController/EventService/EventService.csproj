@@ -10,4 +10,10 @@
 		<ProjectReference Include="..\ProtoClient\ProtoClient.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="event_code.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 </Project>
