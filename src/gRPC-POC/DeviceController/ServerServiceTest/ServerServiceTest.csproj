@@ -11,12 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AuthService\AuthService.csproj" />
     <ProjectReference Include="..\Cli\Cli.csproj" />
-    <ProjectReference Include="..\ConnectService\ConnectService.csproj" />
-    <ProjectReference Include="..\EventService\EventService.csproj" />
     <ProjectReference Include="..\GatewayClient\GatewayClient.csproj" />
-    <ProjectReference Include="..\ServerService\ServerService.csproj" />
   </ItemGroup>
 	
 </Project>

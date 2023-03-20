@@ -11,10 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConnectService\ConnectService.csproj" />
-    <ProjectReference Include="..\DviceService\DviceService.csproj" />
+    <ProjectReference Include="..\DevicesServices\DevicesServices.csproj" />
     <ProjectReference Include="..\GatewayClient\GatewayClient.csproj" />
-    <ProjectReference Include="..\OperatorService\OperatorService.csproj" />
   </ItemGroup>
 
 </Project>

@@ -10,8 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConnectService\ConnectService.csproj" />
+    <ProjectReference Include="..\DevicesServices\DevicesServices.csproj" />
     <ProjectReference Include="..\GatewayClient\GatewayClient.csproj" />
-    <ProjectReference Include="..\ScheduleService\ScheduleService.csproj" />
   </ItemGroup>
 </Project>

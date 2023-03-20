@@ -12,9 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Cli\Cli.csproj" />
-    <ProjectReference Include="..\ConnectService\ConnectService.csproj" />
     <ProjectReference Include="..\GatewayClient\GatewayClient.csproj" />
-    <ProjectReference Include="..\RtspService\RtspService.csproj" />
   </ItemGroup>
 
 </Project>

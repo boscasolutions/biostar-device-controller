@@ -7,11 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConnectService\ConnectService.csproj" />
-    <ProjectReference Include="..\DviceService\DviceService.csproj" />
-    <ProjectReference Include="..\EventService\EventService.csproj" />
+    <ProjectReference Include="..\DevicesServices\DevicesServices.csproj" />
     <ProjectReference Include="..\GatewayClient\GatewayClient.csproj" />
-    <ProjectReference Include="..\UserService\UserService.csproj" />
+    <ProjectReference Include="..\MasterGateway\MasterGateway.csproj" />
   </ItemGroup>
 
 </Project>

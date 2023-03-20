@@ -12,12 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Cli\Cli.csproj" />
-    <ProjectReference Include="..\ConnectService\ConnectService.csproj" />
-    <ProjectReference Include="..\DviceService\DviceService.csproj" />
-    <ProjectReference Include="..\EventService\EventService.csproj" />
-    <ProjectReference Include="..\FaceService\FaceService.csproj" />
     <ProjectReference Include="..\GatewayClient\GatewayClient.csproj" />
-    <ProjectReference Include="..\UserService\UserService.csproj" />
   </ItemGroup>
 
 </Project>
