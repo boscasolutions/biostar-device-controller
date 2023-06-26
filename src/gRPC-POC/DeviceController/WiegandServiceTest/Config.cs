@@ -22,11 +22,12 @@ namespace example
 
             Console.WriteLine(Environment.NewLine + "===== Wiegand Config Test" + Environment.NewLine);
 
-            Test26bit(deviceID);
-            Test37bit(deviceID);
+            // Test26bit(deviceID);
+            // Test37bit(deviceID);
+            Test_Set_IO_To_Output(deviceID);
 
             // Restore the original configuration   
-            wiegandSvc.SetConfig(deviceID, origConfig);
+            // wiegandSvc.SetConfig(deviceID, origConfig);
         }
 
         // 26 bit standard
@@ -108,7 +109,39 @@ namespace example
             var newConfig = wiegandSvc.GetConfig(deviceID);
             wiegandSvc.PrintConfig(newConfig);
         }
+        
+        void Test_Set_IO_To_Output(uint deviceID)
+        {
+            WiegandFormat default26bit = new WiegandFormat
+            {
+                Length = 26,
+                IDFields = {
+          ByteString.CopyFrom(new byte[]{0, 1, /**/ 1, 1, 1, 1, 1, 1, 1, 0, /**/ 0, 0, 0, 0, 0, 0, 0, 0, /**/ 0, 0, 0, 0, 0, 0, 0, 0}), // Facility Code
+          ByteString.CopyFrom(new byte[]{0, 0, /**/ 0, 0, 0, 0, 0, 0, 0, 1, /**/ 1, 1, 1, 1, 1, 1, 1, 1, /**/ 1, 1, 1, 1, 1, 1, 1, 0}) // ID
+        },
+                ParityFields = {
+          new ParityField{ ParityPos = 0, ParityType = WiegandParity.Even, Data = ByteString.CopyFrom(new byte[]{0, 1, /**/ 1, 1, 1, 1, 1, 1, 1, 1, /**/ 1, 1, 1, 0, 0, 0, 0, 0, /**/ 0, 0, 0, 0, 0, 0, 0, 0}) },
+          new ParityField{ ParityPos = 25, ParityType = WiegandParity.Odd, Data = ByteString.CopyFrom(new byte[]{0, 0, /**/ 0, 0, 0, 0, 0, 0, 0, 0, /**/ 0, 0, 0, 1, 1, 1, 1, 1, /**/ 1, 1, 1, 1, 1, 1, 1, 0}) }
+        }
+            };
 
+            WiegandConfig defaultConfig = new WiegandConfig
+            {
+                Mode = WiegandMode.WiegandOutOnly,
+                UseWiegandBypass = false,
+                UseFailCode = false,
+
+                OutPulseWidth = 50,
+                OutPulseInterval = 1000,
+                Formats = { default26bit }
+            };
+
+            wiegandSvc.SetConfig(deviceID, defaultConfig);
+
+            Console.WriteLine(">>> Wiegand Config with Standard 26bit Format" + Environment.NewLine);
+
+            var newConfig = wiegandSvc.GetConfig(deviceID);
+            wiegandSvc.PrintConfig(newConfig);
+        }
     }
 }
-

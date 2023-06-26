@@ -10,9 +10,9 @@ namespace example
         private const string GATEWAY_ADDR = "localhost";
         private const int GATEWAY_PORT = 4000;
 
-        private const string DEVICE_ADDR = "192.168.1.74";
+        private const string DEVICE_ADDR = "192.168.1.46";
         private const int DEVICE_PORT = 51211;
-        private const bool USE_SSL = false;
+        private const bool USE_SSL = true;
 
         private GatewayClient gatewayClient;
         private ConnectSvc connectSvc;
