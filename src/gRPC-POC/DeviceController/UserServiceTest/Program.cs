@@ -10,23 +10,23 @@ namespace example
     class UserTest
     {
         private const string GATEWAY_CA_FILE = "../../../../cert/ca.crt";
-        private const string GATEWAY_ADDR = "192.168.8.98";
+        private const string GATEWAY_ADDR = "localhost";
         private const int GATEWAY_PORT = 4000;
 
-        private const string DEVICE_ADDR = "192.168.8.227";
+        private const string DEVICE_ADDR = "192.168.1.46";
         private const int DEVICE_PORT = 51211;
         private const bool USE_SSL = false;
 
-        private const string CODE_MAP_FILE = "../../event/event_code.json";
+        private const string CODE_MAP_FILE = "../../../../DevicesServices/event_code.json";
 
         private GatewayClient gatewayClient;
         private ConnectSvc connectSvc;
         private UserSvc userSvc;
-        private EventSvc eventSvc;
+        // private EventSvc eventSvc;
         private DeviceSvc deviceSvc;
-        private AuthSvc authSvc;
+        // private AuthSvc authSvc;
         private CardSvc cardSvc;
-        private FingerSvc fingerSvc;
+        // private FingerSvc fingerSvc;
         private FaceSvc faceSvc;
 
         public UserTest(GatewayClient client)
@@ -35,11 +35,11 @@ namespace example
 
             connectSvc = new ConnectSvc(gatewayClient.GetChannel());
             userSvc = new UserSvc(gatewayClient.GetChannel());
-            eventSvc = new EventSvc(gatewayClient.GetChannel());
             deviceSvc = new DeviceSvc(gatewayClient.GetChannel());
-            authSvc = new AuthSvc(gatewayClient.GetChannel());
+            // eventSvc = new EventSvc(gatewayClient.GetChannel());
+            // authSvc = new AuthSvc(gatewayClient.GetChannel());
             cardSvc = new CardSvc(gatewayClient.GetChannel());
-            fingerSvc = new FingerSvc(gatewayClient.GetChannel());
+            // fingerSvc = new FingerSvc(gatewayClient.GetChannel());
             faceSvc = new FaceSvc(gatewayClient.GetChannel());
         }
 
@@ -86,34 +86,36 @@ namespace example
 
             try
             {
-                AuthTest authTest = new AuthTest(userTest.authSvc);
-                AuthConfig origAuthConfig = authTest.PrepareAuthConfig(devID);
+                //AuthTest authTest = new AuthTest(userTest.authSvc);
+                //AuthConfig origAuthConfig = authTest.PrepareAuthConfig(devID);
 
-                LogTest logTest = new LogTest(userTest.eventSvc);
+                //LogTest logTest = new LogTest(userTest.eventSvc);
 
-                userTest.eventSvc.InitCodeMap(CODE_MAP_FILE);
-                userTest.eventSvc.StartMonitoring(devID);
-                userTest.eventSvc.SetCallback(logTest.EventCallback);
+                //userTest.eventSvc.InitCodeMap(CODE_MAP_FILE);
+                //userTest.eventSvc.StartMonitoring(devID);
+                //userTest.eventSvc.SetCallback(logTest.EventCallback);
 
+                // var userCount = userTest.GetUsers(devID);
                 var newUserID = userTest.EnrollUser(devID, capability.ExtendedAuthSupported);
+                new CardTokenTest(userTest.cardSvc, userTest.userSvc).Test(devID, newUserID);
 
-                if (capability.CardInputSupported)
-                {
-                    new CardTest(userTest.cardSvc, userTest.userSvc).Test(devID, newUserID);
-                }
-                else
-                {
-                    Console.WriteLine("!! The device {0} does not support cards. Skip the card test.", devID);
-                }
+                //if (capability.CardInputSupported)
+                //{
+                //    // new CardTest(userTest.cardSvc, userTest.userSvc).Test(devID, newUserID);
+                //}
+                //else
+                //{
+                //    Console.WriteLine("!! The device {0} does not support cards. Skip the card test.", devID);
+                //}
 
-                if (capability.FingerprintInputSupported)
-                {
-                    new FingerTest(userTest.fingerSvc, userTest.userSvc).Test(devID, newUserID);
-                }
-                else
-                {
-                    Console.WriteLine("!! The device {0} does not support fingerprints. Skip the fingerprint test.", devID);
-                }
+                //if (capability.FingerprintInputSupported)
+                //{
+                //    new FingerTest(userTest.fingerSvc, userTest.userSvc).Test(devID, newUserID);
+                //}
+                //else
+                //{
+                //    Console.WriteLine("!! The device {0} does not support fingerprints. Skip the fingerprint test.", devID);
+                //}
 
                 if (capability.FaceInputSupported)
                 {
@@ -124,15 +126,15 @@ namespace example
                     Console.WriteLine("!! The device {0} does not support faces. Skip the face test.", devID);
                 }
 
-                authTest.Test(devID, capability.ExtendedAuthSupported);
+                //authTest.Test(devID, capability.ExtendedAuthSupported);
 
-                userTest.eventSvc.StopMonitoring(devID);
+                //userTest.eventSvc.StopMonitoring(devID);
 
-                logTest.PrintUserLog(devID, newUserID);
+                //logTest.PrintUserLog(devID, newUserID);
 
-                userTest.userSvc.Delete(devID, new string[] { newUserID });
+                // userTest.userSvc.Delete(devID, new string[] { newUserID });
 
-                userTest.authSvc.SetConfig(devID, origAuthConfig);
+                // userTest.authSvc.SetConfig(devID, origAuthConfig);
             }
             catch (RpcException e)
             {
@@ -145,14 +147,24 @@ namespace example
             }
         }
 
+        public string GetUsers(uint deviceID)
+        {
+            var userList = userSvc.GetList(deviceID);
+
+            Console.WriteLine(Environment.NewLine + "Existing User list: {0}" + Environment.NewLine, userList);
+
+            return userList.Count.ToString();
+        }
+
         public string EnrollUser(uint deviceID, bool extendedAuthSupported)
         {
             var userList = userSvc.GetList(deviceID);
 
             Console.WriteLine(Environment.NewLine + "Existing User list: {0}" + Environment.NewLine, userList);
 
-            string newUserID = string.Format("{0}", DateTimeOffset.UtcNow.ToUnixTimeSeconds());
-            UserInfo newUser = new UserInfo { Hdr = new UserHdr { ID = newUserID } };
+            string newUserID = "10";// string.Format("{0}", DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+
+            UserInfo newUser = new UserInfo { Hdr = new UserHdr { ID = newUserID }, Name = $"John Doe{newUserID}" };
 
             if (extendedAuthSupported)
             {

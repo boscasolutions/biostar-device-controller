@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Cli\Cli.csproj" />
     <ProjectReference Include="..\DevicesServices\DevicesServices.csproj" />
     <ProjectReference Include="..\GatewayClient\GatewayClient.csproj" />
   </ItemGroup>

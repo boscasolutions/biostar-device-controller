@@ -3,7 +3,7 @@ using example;
 using Grpc.Core;
 using Gsdk.Connect;
 
-Console.WriteLine("Hello, World!");
+// Console.WriteLine("Hello, World!");
 
 
 
@@ -20,6 +20,31 @@ class ConnectToGrpc
 
     private GatewayClient gatewayClient;
     private ConnectSvc connectSvc;
+
+    public static void Main(string[] args)
+    {
+        // connect to the gateway
+        var gatewayClient = new GatewayClient();
+        
+        gatewayClient.Connect(GATEWAY_CA_FILE, GATEWAY_ADDR, GATEWAY_PORT);
+
+        // connect to gRpc
+        var connectToGrpc = new ConnectToGrpc(gatewayClient);
+
+        // get the gRpc status
+        var tokenSource = connectToGrpc.SubscribeDeviceStatus();
+
+        // TODO: add more functional stuff here to mimic a process
+
+
+
+
+        MainMenu mainMenu = new MainMenu(connectToGrpc.GetConnectSvc());
+        mainMenu.Show();
+
+        tokenSource.Cancel();
+        gatewayClient.Close();
+    }
 
     public ConnectSvc GetConnectSvc()
     {
@@ -44,29 +69,6 @@ class ConnectToGrpc
         return cancellationTokenSource;
     }
 
-    public static void Main(string[] args)
-    {
-        // connect to the gateway
-        var gatewayClient = new GatewayClient();
-        gatewayClient.Connect(GATEWAY_CA_FILE, GATEWAY_ADDR, GATEWAY_PORT);
-
-        // connect to gRpc
-        var connectToGrpc = new ConnectToGrpc(gatewayClient);
-
-        // get the gRpc status
-        var tokenSource = connectToGrpc.SubscribeDeviceStatus();
-
-
-
-
-
-
-
-
-
-        tokenSource.Cancel();
-        gatewayClient.Close();
-    }
 
     static async void ReceiveStatus(IAsyncStreamReader<StatusChange> stream, CancellationToken token)
     {

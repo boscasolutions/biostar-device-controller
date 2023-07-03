@@ -12,7 +12,7 @@ namespace example
 
         private const string DEVICE_ADDR = "192.168.1.46";
         private const int DEVICE_PORT = 51211;
-        private const bool USE_SSL = true;
+        private const bool USE_SSL = false;
 
         private GatewayClient gatewayClient;
         private ConnectSvc connectSvc;
@@ -53,7 +53,8 @@ namespace example
 
             try
             {
-                new ConfigTest(wiegandTest.wiegandSvc).Test(devID);
+                // new ConfigTest(wiegandTest.wiegandSvc).Test(devID);
+                new ConfigNet2Test(wiegandTest.wiegandSvc).Test(devID);
             }
             catch (RpcException e)
             {

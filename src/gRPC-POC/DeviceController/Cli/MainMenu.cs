@@ -1,3 +1,4 @@
+using Grpc.Core;
 using Gsdk.Connect;
 
 namespace example
@@ -9,18 +10,19 @@ namespace example
         private DeviceMenu deviceMenu;
         private AsyncMenu asyncMenu;
         private AcceptMenu acceptMenu;
-
+        
         public MainMenu(ConnectSvc svc)
         {
             connectSvc = svc;
 
-            MenuItem[] items = new MenuItem[6];
+            MenuItem[] items = new MenuItem[7];
             items[0] = new MenuItem("1", "Search devices", SearchDevice, false);
             items[1] = new MenuItem("2", "Connect to a device synchronously", ConnectToDevice, false);
             items[2] = new MenuItem("3", "Manage asynchronous connections", ShowAsyncMenu, false);
             items[3] = new MenuItem("4", "Accept devices", ShowAcceptMenu, false);
             items[4] = new MenuItem("5", "Device menu", ShowDeviceMenu, false);
-            items[5] = new MenuItem("q", "Quit", null, true);
+            items[5] = new MenuItem("6", "Events", StreamEvents, false);
+            items[6] = new MenuItem("q", "Quit", null, true);
 
             menu = new Menu(items);
 
@@ -74,6 +76,34 @@ namespace example
                 {
                     Console.WriteLine("Cannot connect to the device: {0}", e);
                 }
+            }
+        }
+
+        public void StreamEvents()
+        {
+            var connInfo = GetConnectInfo();
+            uint devID = connectSvc.Connect(connInfo);
+
+            GatewayClient gatewayClient = new GatewayClient();
+            
+            EventSvc eventSvc = new EventSvc(gatewayClient.GetChannel());
+
+            uint[] devIDs = { devID };
+
+            try
+            {
+                LogCli logTest = new LogCli(eventSvc);
+
+                logTest.EventsLoggger(devID);
+            }
+            catch (RpcException e)
+            {
+                Console.WriteLine("Cannot complete the event test for device {0}: {1}", devID, e);
+            }
+            finally
+            {
+                connectSvc.Disconnect(devIDs);
+                gatewayClient.Close();
             }
         }
 

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DevicesServices\DevicesServices.csproj" />
+    <ProjectReference Include="..\GatewayClient\GatewayClient.csproj" />
   </ItemGroup>
 
 </Project>
