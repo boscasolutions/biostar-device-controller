@@ -96,8 +96,14 @@ namespace example
                 //userTest.eventSvc.SetCallback(logTest.EventCallback);
 
                 // var userCount = userTest.GetUsers(devID);
+
+
+
+                //var newUserID = "13";
+
                 var newUserID = userTest.EnrollUser(devID, capability.ExtendedAuthSupported);
                 new CardTokenTest(userTest.cardSvc, userTest.userSvc).Test(devID, newUserID);
+                // new CardTokenTest(userTest.cardSvc, userTest.userSvc).GetUserInfoTest(devID, newUserID);
 
                 //if (capability.CardInputSupported)
                 //{
@@ -162,7 +168,7 @@ namespace example
 
             Console.WriteLine(Environment.NewLine + "Existing User list: {0}" + Environment.NewLine, userList);
 
-            string newUserID = "10";// string.Format("{0}", DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+            string newUserID = "14";// string.Format("{0}", DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
             UserInfo newUser = new UserInfo { Hdr = new UserHdr { ID = newUserID }, Name = $"John Doe{newUserID}" };
 
@@ -174,6 +180,8 @@ namespace example
             {
                 newUser.Setting = new UserSetting { CardAuthMode = (uint)AuthMode.CardOnly, BiometricAuthMode = (uint)AuthMode.BiometricOnly };
             }
+
+            newUser.Setting.EndTime = (uint) DateTime.UtcNow.AddYears(3).Second;
 
             userSvc.Enroll(deviceID, new UserInfo[] { newUser });
 

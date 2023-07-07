@@ -1,8 +1,11 @@
 using Google.Protobuf;
 using Gsdk.Card;
+using Gsdk.Device;
 using Gsdk.User;
 using System;
 using System.Collections;
+using System.Linq;
+using System.Runtime.InteropServices;
 using Type = Gsdk.Card.Type;
 
 namespace example
@@ -38,22 +41,94 @@ namespace example
             var cardData = new CardData { CSNCardData = null, SmartCardData = null };
             cardData.Type = Type.CardTypeCsn;
             cardData.CSNCardData = new CSNCardData();
-            // 7907089
-            var byteArray = ByteString.CopyFrom(new byte[]
-                    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 9, 0, 7, 0, 8, 9});
-            cardData.CSNCardData.Data = byteArray;
 
-            if (cardData.CSNCardData == null)
-            {
-                Console.WriteLine("!! The card is a smart card. For this test, you have to use a CSN card. Skip the card test.");
-                return;
-            }
+            byte[] csnCardData = new byte[32];
+
+            // 7907101
+            var cardNumber = Convert.ToUInt64(7907101);
+            byte[] csnData = new byte[32];
+            
+            csnData = BitConverter.GetBytes(cardNumber);
+            
+            Array.Reverse(csnData);
+            
+            Array.Copy(csnData, 0, csnCardData, csnCardData.Length - csnData.Length, csnData.Length);
+
+
+            //var byteArray = ByteString.CopyFrom(new byte[32]
+            // //        {48+7, 48+9, 48+0, 48+7, 48+1, 48+0, 48+1, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0});
+            //// { 7, 9, 0, 7, 1, 0, 1});
+
+            ////{37, 39, 30, 37, 31, 30, 31, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30});
+            // {37, 39, 30, 37, 31, 30, 31, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30});
+
+            //// var byteArray = ByteString.CopyFrom(new byte[32] {30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 37, 39, 30, 37, 31, 30, 31});
+
+            //byteArray.Reverse();
+
+            cardData.CSNCardData.Type = Type.CardTypeCsn;
+            cardData.CSNCardData.Size = 32;
+
+            cardData.CSNCardData.Data = ByteString.CopyFrom(csnCardData);
 
             var userCard = new UserCard { UserID = userID };
+            
             userCard.Cards.Add(cardData.CSNCardData);
+            
             userSvc.SetCard(deviceID, new UserCard[] { userCard });
 
-            KeyInput.PressEnter(">> Try to authenticate the enrolled card. And, press ENTER to end the test." + Environment.NewLine);
+
+            var newUserInfo = userSvc.GetUser(deviceID, new string[] { userID });            
+            
+            Console.WriteLine("card data:{0}", newUserInfo.FirstOrDefault().Cards[0].Data.ToString());
+
+            KeyInput.PressEnter(">> Press ENTER to end the test." + Environment.NewLine);
+        }
+
+        public void GetUserInfoTest(uint deviceID, string userID)
+        {
+            var newUserInfo = userSvc.GetUser(deviceID, new string[] { userID });
+
+            Console.WriteLine("card data:{0}", newUserInfo.FirstOrDefault().Cards[0].Data.ToString());
+
+            KeyInput.PressEnter(">> Press ENTER to end the test." + Environment.NewLine);
+        }
+
+        private byte[] GetCardNumber(int cardNumber)
+        {
+
+            // Card Type for CSN : 1
+            // For CSN you will need to enroll the card type as 1 which means CSN card.
+
+            // When enrolling a wiegand card such as HID Prox or iClass, you will need to input the type according
+            // to the wiegand format set on the device.
+            // For example, if a 26 bit format is stored on the BS2WiegandMultiConfig.formats[0], and if you want to enroll
+            // a 26 bit wiegand card, the type should be 0x1A
+            // If a 37 bit format is stored on the BS2WiegandMultiConfig.formats[1] the type should be 0x2A
+            // It goes on and on with the same pattern.
+
+
+                //byte[] csnData = new byte[cardNumber.ToString().Length];
+
+                //csnData = BitConverter.GetBytes(cardNumber);
+                //Array.Reverse(csnData);
+
+                //Array.Clear(csnCard.data, 0, csnCard.data.Length);
+                //Array.Copy(csnData, 0, csnCard.data, csnCard.data.Length - csnData.Length, csnData.Length);
+
+                //byte[] cardData = new byte[structSize];
+
+                //Marshal.StructureToPtr(csnCard, csnObj, true);
+                //Marshal.Copy(csnObj, cardData, 0, structSize);
+
+
+
+                //Marshal.Copy(cardData, 0, cardObj, structSize);
+                //cardObj += structSize;
+
+                //return cardData;
+
+            return null;
         }
     }
 }
