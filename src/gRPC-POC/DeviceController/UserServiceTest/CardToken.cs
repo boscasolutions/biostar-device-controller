@@ -54,18 +54,6 @@ namespace example
             
             Array.Copy(csnData, 0, csnCardData, csnCardData.Length - csnData.Length, csnData.Length);
 
-
-            //var byteArray = ByteString.CopyFrom(new byte[32]
-            // //        {48+7, 48+9, 48+0, 48+7, 48+1, 48+0, 48+1, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0, 48+0});
-            //// { 7, 9, 0, 7, 1, 0, 1});
-
-            ////{37, 39, 30, 37, 31, 30, 31, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30});
-            // {37, 39, 30, 37, 31, 30, 31, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30});
-
-            //// var byteArray = ByteString.CopyFrom(new byte[32] {30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 37, 39, 30, 37, 31, 30, 31});
-
-            //byteArray.Reverse();
-
             cardData.CSNCardData.Type = Type.CardTypeCsn;
             cardData.CSNCardData.Size = 32;
 
@@ -76,7 +64,6 @@ namespace example
             userCard.Cards.Add(cardData.CSNCardData);
             
             userSvc.SetCard(deviceID, new UserCard[] { userCard });
-
 
             var newUserInfo = userSvc.GetUser(deviceID, new string[] { userID });            
             
