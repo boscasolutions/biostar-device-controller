@@ -181,7 +181,7 @@ namespace example
                 newUser.Setting = new UserSetting { CardAuthMode = (uint)AuthMode.CardOnly, BiometricAuthMode = (uint)AuthMode.BiometricOnly };
             }
 
-            newUser.Setting.EndTime = (uint) DateTime.UtcNow.AddYears(3).Second;
+            newUser.Setting.EndTime = ToDeviceDateTime(DateTime.UtcNow.AddYears(3));
 
             userSvc.Enroll(deviceID, new UserInfo[] { newUser });
 
@@ -189,6 +189,14 @@ namespace example
             Console.WriteLine(Environment.NewLine + "Test User: {0}" + Environment.NewLine, newUsers[0]);
 
             return newUserID;
+        }
+
+        public UInt32 ToDeviceDateTime(DateTime dateTime)
+        {
+            DateTime startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            TimeSpan currTime = dateTime - startTime;
+
+            return Convert.ToUInt32(Math.Abs(currTime.TotalSeconds));
         }
     }
 }
