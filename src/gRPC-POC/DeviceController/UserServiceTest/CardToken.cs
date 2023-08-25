@@ -83,7 +83,6 @@ namespace example
 
         private byte[] GetCardNumber(int cardNumber)
         {
-
             // Card Type for CSN : 1
             // For CSN you will need to enroll the card type as 1 which means CSN card.
 
@@ -119,4 +118,3 @@ namespace example
         }
     }
 }
-
