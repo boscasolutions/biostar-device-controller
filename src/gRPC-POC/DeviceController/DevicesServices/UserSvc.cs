@@ -30,14 +30,14 @@ namespace example
             }
         }
 
-        public RepeatedField<UserInfo> GetUser(uint deviceID, string[] userIDs)
+        public async Task<RepeatedField<UserInfo>> GetUserAsync(uint deviceID, string[] userIDs)
         {
             var request = new GetRequest { DeviceID = deviceID };
             request.UserIDs.AddRange(userIDs);
 
             try
             {
-                var response = userClient.Get(request);
+                var response = await userClient.GetAsync(request);
 
                 return response.Users;
             }
@@ -48,7 +48,7 @@ namespace example
             }
         }
 
-        public void Enroll(uint deviceID, UserInfo[] users)
+        public async Task EnrollAsync(uint deviceID, UserInfo[] users)
         {
             var request = new EnrollRequest { DeviceID = deviceID };
             request.Users.AddRange(users);
@@ -56,7 +56,7 @@ namespace example
 
             try
             {
-                userClient.Enroll(request);
+                await userClient.EnrollAsync(request);
             }
             catch (RpcException e)
             {
@@ -65,7 +65,7 @@ namespace example
             }
         }
 
-        public void EnrollMulti(uint[] deviceIDs, UserInfo[] users)
+        public async Task EnrollMultiAsync(uint[] deviceIDs, UserInfo[] users)
         {
             var request = new EnrollMultiRequest { };
             request.DeviceIDs.AddRange(deviceIDs);
@@ -73,7 +73,7 @@ namespace example
 
             try
             {
-                userClient.EnrollMulti(request);
+                await userClient.EnrollMultiAsync(request);
             }
             catch (RpcException e)
             {
@@ -82,14 +82,14 @@ namespace example
             }
         }
 
-        public void Delete(uint deviceID, string[] userIDs)
+        public async Task DeleteAsync(uint deviceID, string[] userIDs)
         {
             var request = new DeleteRequest { DeviceID = deviceID };
             request.UserIDs.AddRange(userIDs);
 
             try
             {
-                userClient.Delete(request);
+                await userClient.DeleteAsync(request);
             }
             catch (RpcException e)
             {
@@ -98,7 +98,7 @@ namespace example
             }
         }
 
-        public void DeleteMulti(uint[] deviceIDs, string[] userIDs)
+        public async Task DeleteMultiAsync(uint[] deviceIDs, string[] userIDs)
         {
             var request = new DeleteMultiRequest { };
             request.DeviceIDs.AddRange(deviceIDs);
@@ -106,7 +106,7 @@ namespace example
 
             try
             {
-                userClient.DeleteMulti(request);
+                await userClient.DeleteMultiAsync(request);
             }
             catch (RpcException e)
             {
@@ -115,14 +115,14 @@ namespace example
             }
         }
 
-        public void SetCard(uint deviceID, UserCard[] userCards)
+        public async Task SetCardAsync(uint deviceID, UserCard[] userCards)
         {
             var request = new SetCardRequest { DeviceID = deviceID };
             request.UserCards.AddRange(userCards);
 
             try
             {
-                userClient.SetCard(request);
+                await userClient.SetCardAsync(request);
             }
             catch (RpcException e)
             {
@@ -131,14 +131,14 @@ namespace example
             }
         }
 
-        public void SetFinger(uint deviceID, UserFinger[] userFingers)
+        public async Task SetFingerAsync(uint deviceID, UserFinger[] userFingers)
         {
             var request = new SetFingerRequest { DeviceID = deviceID };
             request.UserFingers.AddRange(userFingers);
 
             try
             {
-                userClient.SetFinger(request);
+                await userClient.SetFingerAsync(request);
             }
             catch (RpcException e)
             {
@@ -147,14 +147,14 @@ namespace example
             }
         }
 
-        public void SetFace(uint deviceID, UserFace[] userFaces)
+        public async Task SetFaceAsync(uint deviceID, UserFace[] userFaces)
         {
             var request = new SetFaceRequest { DeviceID = deviceID };
             request.UserFaces.AddRange(userFaces);
 
             try
             {
-                userClient.SetFace(request);
+                await userClient.SetFaceAsync(request);
             }
             catch (RpcException e)
             {
@@ -163,14 +163,14 @@ namespace example
             }
         }
 
-        public void SetAccessGroup(uint deviceID, UserAccessGroup[] groups)
+        public async Task SetAccessGroupAsync(uint deviceID, UserAccessGroup[] groups)
         {
             var request = new SetAccessGroupRequest { DeviceID = deviceID };
             request.UserAccessGroups.AddRange(groups);
 
             try
             {
-                userClient.SetAccessGroup(request);
+                await userClient.SetAccessGroupAsync(request);
             }
             catch (RpcException e)
             {
@@ -179,14 +179,14 @@ namespace example
             }
         }
 
-        public RepeatedField<UserAccessGroup> GetAccessGroup(uint deviceID, string[] userIDs)
+        public async Task<RepeatedField<UserAccessGroup>> GetAccessGroupAsync(uint deviceID, string[] userIDs)
         {
             var request = new GetAccessGroupRequest { DeviceID = deviceID };
             request.UserIDs.AddRange(userIDs);
 
             try
             {
-                var response = userClient.GetAccessGroup(request);
+                var response = await userClient.GetAccessGroupAsync(request);
                 return response.UserAccessGroups;
             }
             catch (RpcException e)

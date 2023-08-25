@@ -3,6 +3,7 @@ using Gsdk.Device;
 using Gsdk.Door;
 using Gsdk.User;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -26,14 +27,14 @@ namespace example
             this.logTest = logTest;
         }
 
-        public void Test(uint deviceID)
+        public async Task TestAsync(uint deviceID)
         {
             // Backup the original doors
             var origDoors = doorSvc.GetList(deviceID);
             Console.WriteLine(Environment.NewLine + "Original Doors: {0}" + Environment.NewLine, origDoors);
 
             TestDoor(deviceID);
-            TestAccessGroup(deviceID);
+            await TestAccessGroupAsync(deviceID);
 
             // Restore the original doors
             doorSvc.DeleteAll(deviceID);
@@ -85,7 +86,7 @@ namespace example
             KeyInput.PressEnter(">> Press ENTER for the next test." + Environment.NewLine);
         }
 
-        void TestAccessGroup(uint deviceID)
+        async Task TestAccessGroupAsync(uint deviceID)
         {
             var userID = logTest.GetUserID(deviceID);
 
@@ -98,7 +99,7 @@ namespace example
             // Backup access groups
             var origGroups = accessSvc.GetList(deviceID);
             var origLevels = accessSvc.GetLevelList(deviceID);
-            var origUserAccessGroups = userSvc.GetAccessGroup(deviceID, new string[] { userID });
+            var origUserAccessGroups = await userSvc.GetAccessGroupAsync(deviceID, new string[] { userID });
 
             Console.WriteLine("Original Access Groups: {0}", origGroups);
             Console.WriteLine("Original Access Levels: {0}", origLevels);
@@ -122,11 +123,11 @@ namespace example
             var userAccessGroup = new UserAccessGroup { UserID = userID };
             userAccessGroup.AccessGroupIDs.Add(TEST_ACCESS_GROUP_ID);
 
-            userSvc.SetAccessGroup(deviceID, new UserAccessGroup[] { userAccessGroup });
+            await userSvc.SetAccessGroupAsync(deviceID, new UserAccessGroup[] { userAccessGroup });
 
             var newGroups = accessSvc.GetList(deviceID);
             var newLevels = accessSvc.GetLevelList(deviceID);
-            var newUserAccessGroups = userSvc.GetAccessGroup(deviceID, new string[] { userID });
+            var newUserAccessGroups = await userSvc.GetAccessGroupAsync(deviceID, new string[] { userID });
 
             Console.WriteLine("Test Access Groups: {0}", newGroups);
             Console.WriteLine("Test Access Levels: {0}" + Environment.NewLine, newLevels);
@@ -140,7 +141,7 @@ namespace example
             // Restore access groups
             var userArray = new UserAccessGroup[origUserAccessGroups.Count];
             origUserAccessGroups.CopyTo(userArray, 0);
-            userSvc.SetAccessGroup(deviceID, userArray);
+            await userSvc.SetAccessGroupAsync(deviceID, userArray);
             accessSvc.DeleteAll(deviceID);
             accessSvc.DeleteAllLevel(deviceID);
 

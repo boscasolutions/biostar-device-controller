@@ -4,6 +4,7 @@ using Gsdk.Face;
 using Gsdk.User;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -55,7 +56,7 @@ namespace example
             return warpedImageData;
         }
 
-        public void EnrollFaceUser(uint deviceID, ref ByteString warpedImageData, string profileImageFileName)
+        public async Task<ByteString> EnrollFaceUserAsync(uint deviceID, ByteString warpedImageData, string profileImageFileName)
         {
             Console.WriteLine("Enroll user");
 
@@ -85,9 +86,11 @@ namespace example
             faceData11.ImageData = warpedImageData;
             userInfo11.Faces.Add(faceData11);
 
-            userSvc.Enroll(deviceID, new UserInfo[] { userInfo10, userInfo11 });
+            await userSvc.EnrollAsync(deviceID, new UserInfo[] { userInfo10, userInfo11 });
 
             Console.WriteLine("Enroll user finished");
+
+            return warpedImageData;
         }
 
         public string[] GetFaceUserList(uint deviceID)
@@ -106,11 +109,12 @@ namespace example
             return userIDs;
         }
 
-        public void GetFaceUsers(uint deviceID, ref string[] userIDs)
+        public async Task<string[]> GetFaceUsersAsync(uint deviceID, string[] userIDs)
         {
             Console.WriteLine("Get users");
 
-            RepeatedField<UserInfo> userInfo = userSvc.GetUser(deviceID, userIDs);
+            RepeatedField<UserInfo> userInfo = await userSvc.GetUserAsync(deviceID, userIDs);
+
             foreach (UserInfo info in userInfo)
             {
                 Console.WriteLine("ID : {0}", info.Hdr.ID);
@@ -124,6 +128,8 @@ namespace example
                     setImageData(userDeviceImage, ref data);
                 }
             }
+
+            return userIDs;
         }
     }
 }

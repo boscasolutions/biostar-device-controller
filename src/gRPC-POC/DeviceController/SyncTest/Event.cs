@@ -1,6 +1,7 @@
 using Google.Protobuf.Collections;
 using Gsdk.Event;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -17,10 +18,10 @@ namespace example
             testConfig = config;
         }
 
-        public void HandleEvent(EventCallback callback)
+        public async Task HandleEventAsync(EventCallback callback)
         {
-            eventSvc.SetCallback(callback);
-            eventSvc.StartMonitoring();
+            await eventSvc.SetCallback(callback);
+            await eventSvc.StartMonitoringAsync();
         }
 
         public void StopHandleEvent()

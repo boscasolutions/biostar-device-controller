@@ -23,7 +23,7 @@ namespace example
             eventClient = new Event.EventClient(channel);
         }
 
-        public void SetCallback(EventCallback eventCallback)
+        public async Task SetCallback(EventCallback eventCallback)
         {
             callback = eventCallback;
         }
@@ -53,7 +53,7 @@ namespace example
             return response.ImageEvents;
         }
 
-        public void StartMonitoring(uint deviceID)
+        public async Task StartMonitoringAsync(uint deviceID)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace example
 
                 cancellationTokenSource = new CancellationTokenSource();
 
-                ReceiveEvents(this, call.ResponseStream, cancellationTokenSource.Token);
+                await ReceiveEvents(this, call.ResponseStream, cancellationTokenSource.Token);
             }
             catch (RpcException e)
             {
@@ -88,20 +88,20 @@ namespace example
             }
         }
 
-        public void StartMonitoringMulti(uint[] deviceIDs)
+        public async Task StartMonitoringMultiAsync(uint[] deviceIDs)
         {
             try
             {
                 var enableRequest = new EnableMonitoringMultiRequest { };
                 enableRequest.DeviceIDs.AddRange(deviceIDs);
-                eventClient.EnableMonitoringMulti(enableRequest);
+                await eventClient.EnableMonitoringMultiAsync(enableRequest);
 
                 var subscribeRequest = new SubscribeRealtimeLogRequest { DeviceIDs = { deviceIDs }, QueueSize = MONITORING_QUEUE_SIZE };
                 var call = eventClient.SubscribeRealtimeLog(subscribeRequest);
 
                 cancellationTokenSource = new CancellationTokenSource();
 
-                ReceiveEvents(this, call.ResponseStream, cancellationTokenSource.Token);
+                await ReceiveEvents(this, call.ResponseStream, cancellationTokenSource.Token);
             }
             catch (RpcException e)
             {
@@ -110,7 +110,7 @@ namespace example
             }
         }
 
-        public void StartMonitoring()
+        public async Task StartMonitoringAsync()
         {
             try
             {
@@ -119,7 +119,7 @@ namespace example
 
                 cancellationTokenSource = new CancellationTokenSource();
 
-                ReceiveEvents(this, call.ResponseStream, cancellationTokenSource.Token);
+                await ReceiveEvents(this, call.ResponseStream, cancellationTokenSource.Token);
             }
             catch (RpcException e)
             {
@@ -128,7 +128,7 @@ namespace example
             }
         }
 
-        static async void ReceiveEvents(EventSvc svc, IAsyncStreamReader<EventLog> stream, CancellationToken token)
+        static async Task ReceiveEvents(EventSvc svc, IAsyncStreamReader<EventLog> stream, CancellationToken token)
         {
             Console.WriteLine("Start receiving real-time events");
 
@@ -165,10 +165,10 @@ namespace example
             }
         }
 
-        public void StopMonitoring(uint deviceID)
+        public async Task StopMonitoringAsync(uint deviceID)
         {
             var disableRequest = new DisableMonitoringRequest { DeviceID = deviceID };
-            eventClient.DisableMonitoring(disableRequest);
+            await eventClient.DisableMonitoringAsync(disableRequest);
 
             if (cancellationTokenSource != null)
             {
@@ -176,11 +176,11 @@ namespace example
             }
         }
 
-        public void StopMonitoringMulti(uint[] deviceIDs)
+        public async Task StopMonitoringMultiAsync(uint[] deviceIDs)
         {
             var disableRequest = new DisableMonitoringMultiRequest { };
             disableRequest.DeviceIDs.AddRange(deviceIDs);
-            eventClient.DisableMonitoringMulti(disableRequest);
+            await eventClient.DisableMonitoringMultiAsync(disableRequest);
 
             if (cancellationTokenSource != null)
             {
@@ -188,10 +188,10 @@ namespace example
             }
         }
 
-        public void DisableMonitoring(uint deviceID)
+        public async Task DisableMonitoringAsync(uint deviceID)
         {
             var disableRequest = new DisableMonitoringRequest { DeviceID = deviceID };
-            eventClient.DisableMonitoring(disableRequest);
+            await eventClient.DisableMonitoringAsync(disableRequest);
         }
 
         public void StopMonitoring()

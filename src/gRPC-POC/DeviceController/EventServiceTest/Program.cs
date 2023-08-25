@@ -1,6 +1,7 @@
 using Grpc.Core;
 using Gsdk.Connect;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -26,7 +27,7 @@ namespace example
             eventSvc = new EventSvc(gatewayClient.GetChannel());
         }
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             GatewayClient gatewayClient = null;
             EventTest eventTest = null;
@@ -40,7 +41,7 @@ namespace example
                 eventTest = new EventTest(gatewayClient);
 
                 var connectInfo = new ConnectInfo { IPAddr = DEVICE_ADDR, Port = DEVICE_PORT, UseSSL = USE_SSL };
-                devID = eventTest.connectSvc.Connect(connectInfo);
+                devID = await eventTest.connectSvc.ConnectAsync(connectInfo);
             }
             catch (RpcException e)
             {
@@ -63,7 +64,7 @@ namespace example
             }
             finally
             {
-                eventTest.connectSvc.Disconnect(devIDs);
+                await eventTest.connectSvc.Disconnect(devIDs);
                 gatewayClient.Close();
             }
         }

@@ -12,25 +12,25 @@ namespace example
             connectSvc = svc;
 
             MenuItem[] items = new MenuItem[6];
-            items[0] = new MenuItem("1", "Add devices to the filter", AddDevices, false);
-            items[1] = new MenuItem("2", "Delete devices from the filter", DeleteDevices, false);
-            items[2] = new MenuItem("3", "Allow all devices", AllowAll, false);
-            items[3] = new MenuItem("4", "Disallow all devices", DisallowAll, false);
-            items[4] = new MenuItem("5", "Refresh the pending device list", ShowPendingList, false);
+            items[0] = new MenuItem("1", "Add devices to the filter", AddDevicesAsync, false);
+            items[1] = new MenuItem("2", "Delete devices from the filter", DeleteDevicesAsync, false);
+            items[2] = new MenuItem("3", "Allow all devices", AllowAllAsync, false);
+            items[3] = new MenuItem("4", "Disallow all devices", DisallowAllAsync, false);
+            items[4] = new MenuItem("5", "Refresh the pending device list", ShowPendingListAsync, false);
             items[5] = new MenuItem("q", "Return to Main Menu", null, true);
 
             menu = new Menu(items);
         }
 
-        public void Show()
+        public async Task ShowAsync()
         {
-            ShowAcceptFilter();
-            ShowPendingList();
+            await ShowAcceptFilterAsync();
+            await ShowPendingListAsync();
 
             menu.Show("Accept Menu");
         }
 
-        public void AddDevices()
+        public async Task AddDevicesAsync()
         {
             Console.WriteLine("Enter the device IDs to add");
 
@@ -43,7 +43,7 @@ namespace example
 
             try
             {
-                AcceptFilter filter = connectSvc.GetAcceptFilter();
+                AcceptFilter filter = await connectSvc.GetAcceptFilterAsync();
 
                 for (int i = 0; i < deviceIDs.Length; i++)
                 {
@@ -55,8 +55,8 @@ namespace example
 
                 filter.AllowAll = false;
 
-                connectSvc.SetAcceptFilter(filter);
-                ShowAcceptFilter();
+                await connectSvc.SetAcceptFilterAsync(filter);
+                await ShowAcceptFilterAsync();
             }
             catch (Exception e)
             {
@@ -64,7 +64,7 @@ namespace example
             }
         }
 
-        public void DeleteDevices()
+        public async Task DeleteDevicesAsync()
         {
             Console.WriteLine("Enter the device IDs to delete");
 
@@ -77,7 +77,7 @@ namespace example
 
             try
             {
-                AcceptFilter filter = connectSvc.GetAcceptFilter();
+                AcceptFilter filter = await connectSvc.GetAcceptFilterAsync();
 
                 for (int i = 0; i < deviceIDs.Length; i++)
                 {
@@ -86,8 +86,8 @@ namespace example
 
                 filter.AllowAll = false;
 
-                connectSvc.SetAcceptFilter(filter);
-                ShowAcceptFilter();
+                await connectSvc.SetAcceptFilterAsync(filter);
+                await ShowAcceptFilterAsync();
             }
             catch (Exception e)
             {
@@ -95,14 +95,14 @@ namespace example
             }
         }
 
-        public void AllowAll()
+        public async Task AllowAllAsync()
         {
             AcceptFilter filter = new AcceptFilter { AllowAll = true };
 
             try
             {
-                connectSvc.SetAcceptFilter(filter);
-                ShowAcceptFilter();
+                await connectSvc.SetAcceptFilterAsync(filter);
+                await ShowAcceptFilterAsync();
             }
             catch (Exception e)
             {
@@ -110,14 +110,14 @@ namespace example
             }
         }
 
-        public void DisallowAll()
+        public async Task DisallowAllAsync()
         {
             AcceptFilter filter = new AcceptFilter { AllowAll = false };
 
             try
             {
-                connectSvc.SetAcceptFilter(filter);
-                ShowAcceptFilter();
+                await connectSvc.SetAcceptFilterAsync(filter);
+                await ShowAcceptFilterAsync();
             }
             catch (Exception e)
             {
@@ -125,13 +125,13 @@ namespace example
             }
         }
 
-        public void ShowAcceptFilter()
+        public async Task ShowAcceptFilterAsync()
         {
             Console.WriteLine("Getting the accept filter...");
 
             try
             {
-                var filter = connectSvc.GetAcceptFilter();
+                var filter = await connectSvc.GetAcceptFilterAsync();
 
                 Console.WriteLine();
                 Console.WriteLine("***** Accept Filter: {0}", filter);
@@ -143,13 +143,13 @@ namespace example
             }
         }
 
-        public void ShowPendingList()
+        public async Task ShowPendingListAsync()
         {
             Console.WriteLine("Getting the pending device list...");
 
             try
             {
-                var devList = connectSvc.GetPendingList();
+                var devList = await connectSvc.GetPendingListAsync();
 
                 Console.WriteLine();
                 Console.WriteLine("***** Pending Devices: {0}", devList.Count);

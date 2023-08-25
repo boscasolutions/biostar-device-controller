@@ -16,7 +16,7 @@ namespace example
             fingerSvc = fSvc;
         }
 
-        public void Test(uint[] deviceIDs)
+        public async Task TestAsync(uint[] deviceIDs)
         {
             foreach (uint deviceID in deviceIDs)
             {
@@ -29,19 +29,19 @@ namespace example
                 newUsers[0] = new UserInfo { Hdr = hdr };
                 newUserIDs[0] = hdr.ID;
 
-                userSvc.Delete(deviceID, newUserIDs);
+                await userSvc.DeleteAsync(deviceID, newUserIDs);
 
-                userSvc.Enroll(deviceID, newUsers);
-                TestFinger(deviceID, newUserIDs[0]);
+                await userSvc.EnrollAsync(deviceID, newUsers);
+                await TestFingerAsync(deviceID, newUserIDs[0]);
             }
         }
 
-        private void TestFinger(uint deviceID, String userID)
+        private async Task TestFingerAsync(uint deviceID, String userID)
         {
             string[] userIDs = new string[1];
             userIDs[0] = userID;
 
-            var users = userSvc.GetUser(deviceID, userIDs);
+            var users = await userSvc.GetUserAsync(deviceID, userIDs);
             Console.WriteLine("User without fingerprint: {0}" + Environment.NewLine, users[0]);
 
             var userFingers = new UserFinger[1];
@@ -59,7 +59,7 @@ namespace example
 
             userFingers[0].Fingers.Add(fingerData);
 
-            userSvc.SetFinger(deviceID, userFingers);
+            await userSvc.SetFingerAsync(deviceID, userFingers);
         }
     }
 }

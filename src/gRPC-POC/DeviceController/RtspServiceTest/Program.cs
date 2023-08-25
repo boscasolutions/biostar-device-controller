@@ -2,6 +2,7 @@ using Grpc.Core;
 using Gsdk.Connect;
 using Gsdk.Rtsp;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -26,7 +27,7 @@ namespace example
             rtspSvc = new RtspSvc(gatewayClient.GetChannel());
         }
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             GatewayClient gatewayClient = null;
             RtspTest rtspTest = null;
@@ -40,7 +41,7 @@ namespace example
                 rtspTest = new RtspTest(gatewayClient);
 
                 var connectInfo = new ConnectInfo { IPAddr = DEVICE_ADDR, Port = DEVICE_PORT, UseSSL = USE_SSL };
-                devID = rtspTest.connectSvc.Connect(connectInfo);
+                devID = await rtspTest.connectSvc.ConnectAsync(connectInfo);
             }
             catch (RpcException e)
             {
@@ -61,7 +62,9 @@ namespace example
             catch (RpcException e)
             {
                 Console.WriteLine("Rtsp service is not supported by the device {0}: {1}", devID, e);
-                rtspTest.connectSvc.Disconnect(devIDs);
+                
+                await rtspTest.connectSvc.Disconnect(devIDs);
+                
                 gatewayClient.Close();
                 Environment.Exit(1);
             }

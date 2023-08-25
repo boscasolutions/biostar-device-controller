@@ -1,5 +1,6 @@
 using Grpc.Core;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -36,7 +37,7 @@ namespace example
             userMgr = new UserMgr(userSvc, cardSvc, config, deviceMgr, eventMgr);
         }
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             GatewayClient client = null;
 
@@ -69,9 +70,10 @@ namespace example
             {
                 Console.WriteLine("Trying to connect to the devices..." + Environment.NewLine);
 
-                syncTest.deviceMgr.HandleConnection(syncTest.eventMgr.HandleConnection);
-                syncTest.deviceMgr.ConnectToDevices();
-                syncTest.eventMgr.HandleEvent(syncTest.userMgr.SyncUser);
+                await syncTest.deviceMgr.HandleConnectionAsync(syncTest.eventMgr.HandleConnection);
+                await syncTest.deviceMgr.ConnectToDevicesAsync();
+
+                // await syncTest.eventMgr.HandleEventAsync(syncTest.userMgr.SyncUserAsync);
 
                 KeyInput.PressEnter(Environment.NewLine + ">>> Press ENTER to show the test menu" + Environment.NewLine + Environment.NewLine);
 
@@ -83,7 +85,7 @@ namespace example
             }
             finally
             {
-                syncTest.deviceMgr.DeleteConnection();
+                await syncTest.deviceMgr.DeleteConnectionAsync();
                 syncTest.eventMgr.StopHandleEvent();
                 client.Close();
             }

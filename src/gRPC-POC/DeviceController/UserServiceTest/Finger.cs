@@ -45,7 +45,7 @@ namespace example
             var userFinger = new UserFinger { UserID = userID };
             userFinger.Fingers.Add(fingerData);
 
-            userSvc.SetFinger(deviceID, new UserFinger[] { userFinger });
+            userSvc.SetFingerAsync(deviceID, new UserFinger[] { userFinger });
 
             KeyInput.PressEnter(">> Try to authenticate the enrolled finger. And, press ENTER to end the test." + Environment.NewLine);
         }

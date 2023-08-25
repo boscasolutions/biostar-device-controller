@@ -1,6 +1,7 @@
 using Gsdk.Connect;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -16,28 +17,28 @@ namespace example
             gatewayID = id;
 
             MenuItem[] items = new MenuItem[4];
-            items[0] = new MenuItem("1", "Add async connections", AddAsyncConnection, false);
-            items[1] = new MenuItem("2", "Delete async connections", DeleteAsyncConnection, false);
-            items[2] = new MenuItem("3", "Refresh the connection list", ShowAsyncConnection, false);
+            items[0] = new MenuItem("1", "Add async connections", AddConnectionAsync, false);
+            items[1] = new MenuItem("2", "Delete async connections", DeleteConnectionAsync, false);
+            items[2] = new MenuItem("3", "Refresh the connection list", ShowConnectionAsync, false);
             items[3] = new MenuItem("q", "Return to Main Menu", null, true);
 
             menu = new Menu(items);
         }
 
-        public void Show()
+        public async Task ShowAsync()
         {
-            ShowAsyncConnection();
+            await ShowConnectionAsync();
 
             menu.Show("Async Menu");
         }
 
-        public void ShowAsyncConnection()
+        public async Task ShowConnectionAsync()
         {
             Console.WriteLine("Getting the async connections...");
 
             try
             {
-                var devList = connectMasterSvc.GetDeviceList(gatewayID);
+                var devList = await connectMasterSvc.GetDeviceListAsync(gatewayID);
                 var asyncConns = new List<DeviceInfo>();
 
                 for (int i = 0; i < devList.Count; i++)
@@ -63,7 +64,7 @@ namespace example
             }
         }
 
-        public void AddAsyncConnection()
+        public async Task AddConnectionAsync()
         {
             List<AsyncConnectInfo> asyncConns = new List<AsyncConnectInfo>();
 
@@ -105,8 +106,8 @@ namespace example
             try
             {
                 Console.WriteLine("Adding async connections...");
-                connectMasterSvc.AddAsyncConnection(gatewayID, asyncConns.ToArray());
-                ShowAsyncConnection();
+                await connectMasterSvc.AddAsyncConnectionAsync(gatewayID, asyncConns.ToArray());
+                await ShowConnectionAsync();
             }
             catch (Exception e)
             {
@@ -114,7 +115,7 @@ namespace example
             }
         }
 
-        public void DeleteAsyncConnection()
+        public async Task DeleteConnectionAsync()
         {
             uint[] deviceIDs = Menu.GetDeviceIDs();
 
@@ -126,8 +127,8 @@ namespace example
             try
             {
                 Console.WriteLine("Deleting async connections...");
-                connectMasterSvc.DeleteAsyncConnection(gatewayID, deviceIDs);
-                ShowAsyncConnection();
+                await connectMasterSvc.DeleteAsyncConnectionAsync(gatewayID, deviceIDs);
+                await ShowConnectionAsync();
             }
             catch (Exception e)
             {

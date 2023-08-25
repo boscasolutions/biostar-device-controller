@@ -46,7 +46,7 @@ namespace example
             eventSvc = new EventSvc(grpcClient.GetChannel());
         }
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             bool masterMode = false;
 
@@ -75,7 +75,7 @@ namespace example
                 }
             }
 
-            GrpcClient client = null;
+            GrpcClient? client = null;
 
             try
             {
@@ -98,7 +98,7 @@ namespace example
                 Environment.Exit(1);
             }
 
-            QuickStart quickStart = null;
+            QuickStart? quickStart = null;
             uint devID1 = 0;
             uint devID2 = 0;
 
@@ -108,13 +108,13 @@ namespace example
 
                 if (masterMode)
                 {
-                    devID1 = new ConnectMasterTest(quickStart.connectMasterSvc).Test(GATEWAY_ID, DEVICE_ADDR_1, DEVICE_PORT, false);
-                    devID2 = new ConnectMasterTest(quickStart.connectMasterSvc).Test(GATEWAY_ID, DEVICE_ADDR_2, DEVICE_PORT, false);
+                    devID1 = await new ConnectMasterTest(quickStart.connectMasterSvc).TestAsync(GATEWAY_ID, DEVICE_ADDR_1, DEVICE_PORT, false);
+                    devID2 = await new ConnectMasterTest(quickStart.connectMasterSvc).TestAsync(GATEWAY_ID, DEVICE_ADDR_2, DEVICE_PORT, false);
                 }
                 else
                 {
-                    devID1 = new ConnectTest(quickStart.connectSvc).Test(DEVICE_ADDR_1, DEVICE_PORT, false);
-                    devID2 = new ConnectTest(quickStart.connectSvc).Test(DEVICE_ADDR_2, DEVICE_PORT, false);
+                    devID1 = await new ConnectTest(quickStart.connectSvc).TestAsync(DEVICE_ADDR_1, DEVICE_PORT, false);
+                    devID2 = await new ConnectTest(quickStart.connectSvc).TestAsync(DEVICE_ADDR_2, DEVICE_PORT, false);
                 }
             }
             catch (RpcException e)
@@ -140,7 +140,7 @@ namespace example
                     new FingerTest(quickStart.fingerSvc).Test(devID2);
                 }
 
-                new UserTest(quickStart.userSvc, quickStart.fingerSvc).Test(devIDs);
+                await new UserTest(quickStart.userSvc, quickStart.fingerSvc).TestAsync(devIDs);
 
                 new EventTest(quickStart.eventSvc).Test(devIDs);
             }
@@ -152,11 +152,11 @@ namespace example
             {
                 if (masterMode)
                 {
-                    quickStart.connectMasterSvc.Disconnect(devIDs);
+                    await quickStart.connectMasterSvc.DisconnectAsync(devIDs);
                 }
                 else
                 {
-                    quickStart.connectSvc.Disconnect(devIDs);
+                    await quickStart.connectSvc.Disconnect(devIDs);
                 }
                 client.Close();
             }

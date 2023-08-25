@@ -2,6 +2,7 @@ using Grpc.Core;
 using Gsdk.Connect;
 using Gsdk.Thermal;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -31,7 +32,7 @@ namespace example
             eventSvc = new EventSvc(gatewayClient.GetChannel());
         }
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             GatewayClient gatewayClient = null;
             ThermalTest thermalTest = null;
@@ -45,7 +46,7 @@ namespace example
                 thermalTest = new ThermalTest(gatewayClient);
 
                 var connectInfo = new ConnectInfo { IPAddr = DEVICE_ADDR, Port = DEVICE_PORT, UseSSL = USE_SSL };
-                devID = thermalTest.connectSvc.Connect(connectInfo);
+                devID = await thermalTest.connectSvc.ConnectAsync(connectInfo);
             }
             catch (RpcException e)
             {
@@ -66,7 +67,9 @@ namespace example
             catch (RpcException e)
             {
                 Console.WriteLine("Thermal service is not supported by the device {0}: {1}", devID, e);
-                thermalTest.connectSvc.Disconnect(devIDs);
+                
+                await thermalTest.connectSvc.Disconnect(devIDs);
+                
                 gatewayClient.Close();
                 Environment.Exit(1);
             }
@@ -76,13 +79,13 @@ namespace example
                 LogTest logTest = new LogTest(thermalTest.thermalSvc, thermalTest.eventSvc);
 
                 thermalTest.eventSvc.InitCodeMap(CODE_MAP_FILE);
-                thermalTest.eventSvc.StartMonitoring(devID);
+                thermalTest.eventSvc.StartMonitoringAsync(devID);
                 thermalTest.eventSvc.SetCallback(logTest.EventCallback);
 
                 new ConfigTest(thermalTest.thermalSvc).Test(devID, config);
                 logTest.Test(devID);
 
-                thermalTest.eventSvc.StopMonitoring(devID);
+                thermalTest.eventSvc.StopMonitoringAsync(devID);
             }
             catch (RpcException e)
             {
@@ -90,7 +93,7 @@ namespace example
             }
             finally
             {
-                thermalTest.connectSvc.Disconnect(devIDs);
+                await thermalTest.connectSvc.Disconnect(devIDs);
                 gatewayClient.Close();
             }
         }

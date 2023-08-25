@@ -1,6 +1,7 @@
 using Grpc.Core;
 using Gsdk.Connect;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -32,7 +33,7 @@ namespace example
             rs485Svc = new Rs485Svc(gatewayClient.GetChannel());
         }
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             GatewayClient gatewayClient = null;
             ApbZoneTest apbTest = null;
@@ -46,7 +47,7 @@ namespace example
                 apbTest = new ApbZoneTest(gatewayClient);
 
                 var connectInfo = new ConnectInfo { IPAddr = DEVICE_ADDR, Port = DEVICE_PORT, UseSSL = USE_SSL };
-                devID = apbTest.connectSvc.Connect(connectInfo);
+                devID = await apbTest.connectSvc.ConnectAsync(connectInfo);
             }
             catch (RpcException e)
             {
@@ -68,12 +69,12 @@ namespace example
                 LogTest logTest = new LogTest(apbTest.eventSvc);
 
                 apbTest.eventSvc.InitCodeMap(CODE_MAP_FILE);
-                apbTest.eventSvc.StartMonitoring(devID);
+                apbTest.eventSvc.StartMonitoringAsync(devID);
                 apbTest.eventSvc.SetCallback(logTest.EventCallback);
 
                 new APBTest(apbTest.apbSvc).Test(devID, rs485Test.GetSlaves());
 
-                apbTest.eventSvc.StopMonitoring(devID);
+                apbTest.eventSvc.StopMonitoringAsync(devID);
             }
             catch (RpcException e)
             {
@@ -82,7 +83,7 @@ namespace example
             finally
             {
                 rs485Test.RestoreSlaves(devID);
-                apbTest.connectSvc.Disconnect(devIDs);
+                await apbTest.connectSvc.Disconnect(devIDs);
                 gatewayClient.Close();
             }
         }

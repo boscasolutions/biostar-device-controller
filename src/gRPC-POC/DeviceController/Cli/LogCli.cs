@@ -18,11 +18,11 @@ namespace example
             firstEventID = 0;
         }
 
-        public void EventsLoggger(uint deviceID)
+        public async Task EventsLogggerAsync(uint deviceID)
         {
             eventSvc.InitCodeMap(CODE_MAP_FILE);
-            eventSvc.StartMonitoring(deviceID);
-            eventSvc.SetCallback(EventCallback);
+            await eventSvc.StartMonitoringAsync(deviceID);
+            await eventSvc.SetCallback(EventCallback);
 
             Console.WriteLine(Environment.NewLine + "===== Event Stream =====" + Environment.NewLine);
 
@@ -56,7 +56,7 @@ namespace example
                 }
             }
 
-            eventSvc.StopMonitoring(deviceID);
+            await eventSvc.StopMonitoringAsync(deviceID);
         }
 
         private void PrintEvent(EventLog logEvent)

@@ -2,6 +2,7 @@ using Google.Protobuf;
 using Grpc.Core;
 using Gsdk.Connect;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -36,7 +37,7 @@ namespace example
             userSvc = new UserSvc(gatewayClient.GetChannel());
         }
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             GatewayClient gatewayClient = null;
             FaceUserTest faceUserTest = null;
@@ -50,7 +51,7 @@ namespace example
                 faceUserTest = new FaceUserTest(gatewayClient);
 
                 var connectInfo = new ConnectInfo { IPAddr = DEVICE_ADDR, Port = DEVICE_PORT, UseSSL = USE_SSL };
-                devID = faceUserTest.connectSvc.Connect(connectInfo);
+                devID = await faceUserTest.connectSvc.ConnectAsync(connectInfo);
             }
             catch (RpcException e)
             {
@@ -67,9 +68,9 @@ namespace example
 
                 ByteString warpedImageData = testUser.NormalizeImage(devID, FACE_UNWARPED_IMAGE);
 
-                testUser.EnrollFaceUser(devID, ref warpedImageData, USER_PROFILE_IMAGE);
+                warpedImageData = await testUser.EnrollFaceUserAsync(devID, warpedImageData, USER_PROFILE_IMAGE);
                 string[] userIDs = testUser.GetFaceUserList(devID);
-                testUser.GetFaceUsers(devID, ref userIDs);
+                userIDs = await testUser.GetFaceUsersAsync(devID, userIDs);
             }
             catch (RpcException e)
             {
@@ -77,7 +78,7 @@ namespace example
             }
             finally
             {
-                faceUserTest.connectSvc.Disconnect(devIDs);
+                await faceUserTest.connectSvc.Disconnect(devIDs);
                 gatewayClient.Close();
             }
         }

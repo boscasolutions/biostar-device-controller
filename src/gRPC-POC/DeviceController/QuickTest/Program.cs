@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -41,7 +42,7 @@ namespace example
             eventSvc = new EventSvc(grpcClient.GetChannel());
         }
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             bool masterMode = false;
 
@@ -85,7 +86,7 @@ namespace example
 
                 if (masterMode)
                 {
-                    devID = new ConnectMasterTest(quickStart.connectMasterSvc).Test(GATEWAY_ID, DEVICE_ADDR, DEVICE_PORT, USE_SSL);
+                    devID = await new ConnectMasterTest(quickStart.connectMasterSvc).TestAsync(GATEWAY_ID, DEVICE_ADDR, DEVICE_PORT, USE_SSL);
                 }
                 else
                 {
@@ -105,27 +106,27 @@ namespace example
                         }
                         else if (input2.Equals("y"))
                         {
-                            devID = new ConnectTest(quickStart.connectSvc).Test(DEVICE_ADDR, DEVICE_PORT, false);
+                            devID = await new ConnectTest(quickStart.connectSvc).TestAsync(DEVICE_ADDR, DEVICE_PORT, false);
                             uint[] devIDs = { devID };
-                            quickStart.connectSvc.EnableSSL(devIDs);
+                            await quickStart.connectSvc.EnableSSLAsync(devIDs);
 
                             if (masterMode)
                             {
-                                quickStart.connectMasterSvc.Disconnect(devIDs);
+                                await quickStart.connectMasterSvc.DisconnectAsync(devIDs);
                             }
                             else
                             {
-                                quickStart.connectSvc.Disconnect(devIDs);
+                                await quickStart.connectSvc.Disconnect(devIDs);
                             }
                             client.Close();
                             return;
                         }
 
-                        devID = new ConnectTest(quickStart.connectSvc).Test(DEVICE_ADDR, DEVICE_PORT, USE_SSL);
+                        devID = await new ConnectTest(quickStart.connectSvc).TestAsync(DEVICE_ADDR, DEVICE_PORT, USE_SSL);
                     }
                     else
                     {
-                        devID = new ConnectTest(quickStart.connectSvc).Test(DEVICE_ADDR, DEVICE_PORT, USE_SSL);
+                        devID = await new ConnectTest(quickStart.connectSvc).TestAsync(DEVICE_ADDR, DEVICE_PORT, USE_SSL);
                     }
                 }
             }
@@ -155,7 +156,7 @@ namespace example
                     new CardTest(quickStart.cardSvc).Test(devID, capabilityInfo);
                 }
 
-                new UserTest(quickStart.userSvc, quickStart.fingerSvc, quickStart.faceSvc).Test(devID, capabilityInfo);
+                new UserTest(quickStart.userSvc, quickStart.fingerSvc, quickStart.faceSvc).TestAsync(devID, capabilityInfo);
                 new EventTest(quickStart.eventSvc).Test(devID);
             }
             catch (RpcException e)
@@ -168,7 +169,7 @@ namespace example
 
                 if (masterMode)
                 {
-                    quickStart.connectMasterSvc.Disconnect(deviceIDs);
+                    quickStart.connectMasterSvc.DisconnectAsync(deviceIDs);
                 }
                 else
                 {

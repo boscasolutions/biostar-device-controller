@@ -1,6 +1,7 @@
 using Grpc.Core;
 using Gsdk.Connect;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -34,7 +35,7 @@ namespace example
             userSvc = new UserSvc(gatewayClient.GetChannel());
         }
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             GatewayClient gatewayClient = null;
             DoorTest doorTest = null;
@@ -48,7 +49,7 @@ namespace example
                 doorTest = new DoorTest(gatewayClient);
 
                 var connectInfo = new ConnectInfo { IPAddr = DEVICE_ADDR, Port = DEVICE_PORT, UseSSL = USE_SSL };
-                devID = doorTest.connectSvc.Connect(connectInfo);
+                devID = await doorTest.connectSvc.ConnectAsync(connectInfo);
             }
             catch (RpcException e)
             {
@@ -64,12 +65,12 @@ namespace example
                 LogTest logTest = new LogTest(doorTest.eventSvc);
 
                 doorTest.eventSvc.InitCodeMap(CODE_MAP_FILE);
-                doorTest.eventSvc.StartMonitoring(devID);
+                doorTest.eventSvc.StartMonitoringAsync(devID);
                 doorTest.eventSvc.SetCallback(logTest.EventCallback);
 
-                new AccessTest(doorTest.doorSvc, doorTest.accessSvc, doorTest.userSvc, logTest).Test(devID);
+                new AccessTest(doorTest.doorSvc, doorTest.accessSvc, doorTest.userSvc, logTest).TestAsync(devID);
 
-                doorTest.eventSvc.StopMonitoring(devID);
+                doorTest.eventSvc.StopMonitoringAsync(devID);
             }
             catch (RpcException e)
             {

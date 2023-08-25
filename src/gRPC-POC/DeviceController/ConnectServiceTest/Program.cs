@@ -2,6 +2,7 @@
 using Gsdk.Connect;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -28,9 +29,9 @@ namespace example
             connectSvc = new ConnectSvc(gatewayClient.GetChannel());
         }
 
-        public CancellationTokenSource SubscribeDeviceStatus()
+        public async Task<CancellationTokenSource> SubscribeDeviceStatusAsync()
         {
-            var devStatusStream = connectSvc.Subscribe(STATUS_QUEUE_SIZE);
+            var devStatusStream = await connectSvc.SubscribeAsync(STATUS_QUEUE_SIZE);
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
@@ -39,14 +40,14 @@ namespace example
             return cancellationTokenSource;
         }
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var gatewayClient = new GatewayClient();
             gatewayClient.Connect(GATEWAY_CA_FILE, GATEWAY_ADDR, GATEWAY_PORT);
 
             var connectTest = new ConnectTest(gatewayClient);
 
-            var tokenSource = connectTest.SubscribeDeviceStatus();
+            var tokenSource = await connectTest.SubscribeDeviceStatusAsync();
 
             MainMenu mainMenu = new MainMenu(connectTest.GetConnectSvc());
             mainMenu.Show();

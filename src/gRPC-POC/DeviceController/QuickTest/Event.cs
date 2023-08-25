@@ -32,12 +32,12 @@ namespace example
                 File.WriteAllBytes(LOG_IMAGE_FILE, imageEvents[0].JPGImage.ToByteArray());
             }
 
-            eventSvc.StartMonitoring(deviceID);
+            eventSvc.StartMonitoringAsync(deviceID);
 
             Console.WriteLine(">>> Generate real-time events for 10 seconds");
             Thread.Sleep(10000);
 
-            eventSvc.StopMonitoring(deviceID);
+            eventSvc.StopMonitoringAsync(deviceID);
         }
     }
 }

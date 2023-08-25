@@ -2,6 +2,7 @@ using Grpc.Core;
 using Gsdk.Connect;
 using Gsdk.Voip;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -26,7 +27,7 @@ namespace example
             voipSvc = new VoipSvc(gatewayClient.GetChannel());
         }
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             GatewayClient gatewayClient = null;
             VoipTest voipTest = null;
@@ -40,7 +41,8 @@ namespace example
                 voipTest = new VoipTest(gatewayClient);
 
                 var connectInfo = new ConnectInfo { IPAddr = DEVICE_ADDR, Port = DEVICE_PORT, UseSSL = USE_SSL };
-                devID = voipTest.connectSvc.Connect(connectInfo);
+
+                devID = await voipTest.connectSvc.ConnectAsync(connectInfo);
             }
             catch (RpcException e)
             {
@@ -61,7 +63,9 @@ namespace example
             catch (RpcException e)
             {
                 Console.WriteLine("Voip service is not supported by the device {0}: {1}", devID, e);
-                voipTest.connectSvc.Disconnect(devIDs);
+
+                await voipTest.connectSvc.Disconnect(devIDs);
+                
                 gatewayClient.Close();
                 Environment.Exit(1);
             }

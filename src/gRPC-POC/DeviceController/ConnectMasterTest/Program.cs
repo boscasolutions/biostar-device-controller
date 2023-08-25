@@ -2,6 +2,7 @@
 using Gsdk.Connect;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -35,9 +36,9 @@ namespace example
             connectMasterSvc = new ConnectMasterSvc(masterClient.GetChannel());
         }
 
-        public CancellationTokenSource SubscribeDeviceStatus()
+        public async Task<CancellationTokenSource> SubscribeDeviceStatusAsync()
         {
-            var devStatusStream = connectMasterSvc.Subscribe(STATUS_QUEUE_SIZE);
+            var devStatusStream = await connectMasterSvc.SubscribeAsync(STATUS_QUEUE_SIZE);
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
@@ -46,14 +47,14 @@ namespace example
             return cancellationTokenSource;
         }
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var masterClient = new MasterClient();
             masterClient.ConnectTenant(MASTER_CA_FILE, TENANT_CERT_FILE, TENANT_KEY_FILE, MASTER_ADDR, MASTER_PORT);
 
             var connectMasterTest = new ConnectMasterTest(masterClient);
 
-            var tokenSource = connectMasterTest.SubscribeDeviceStatus();
+            var tokenSource = await connectMasterTest.SubscribeDeviceStatusAsync();
 
             MasterMainMenu mainMenu = new MasterMainMenu(connectMasterTest.GetConnectMasterSvc(), GATEWAY_ID);
             mainMenu.Show();
@@ -81,7 +82,7 @@ namespace example
             {
                 if (e.StatusCode == StatusCode.Cancelled)
                 {
-                    Console.WriteLine("Monitoring is cancelled");
+                    Console.WriteLine("Monitoring is canceled");
                 }
                 else
                 {
@@ -94,5 +95,4 @@ namespace example
             }
         }
     }
-
 }

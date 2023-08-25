@@ -30,7 +30,7 @@ namespace example
 
             var userCard = new UserCard { UserID = userID };
             userCard.Cards.Add(cardData.CSNCardData);
-            userSvc.SetCard(deviceID, new UserCard[] { userCard });
+            userSvc.SetCardAsync(deviceID, new UserCard[] { userCard });
 
             KeyInput.PressEnter(">> Try to authenticate the enrolled card. And, press ENTER to end the test." + Environment.NewLine);
         }

@@ -1,6 +1,7 @@
 using Grpc.Core;
 using Gsdk.Connect;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -32,7 +33,7 @@ namespace example
             deviceSvc = new DeviceSvc(gatewayClient.GetChannel());
         }
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             GatewayClient gatewayClient = null;
             TNATest tnaTest = null;
@@ -46,7 +47,7 @@ namespace example
                 tnaTest = new TNATest(gatewayClient);
 
                 var connectInfo = new ConnectInfo { IPAddr = DEVICE_ADDR, Port = DEVICE_PORT, UseSSL = USE_SSL };
-                devID = tnaTest.connectSvc.Connect(connectInfo);
+                devID = await tnaTest.connectSvc.ConnectAsync(connectInfo);
             }
             catch (RpcException e)
             {
@@ -59,12 +60,12 @@ namespace example
 
             try
             {
-                var capability = tnaTest.deviceSvc.GetCapability(devID);
+                var capability = await tnaTest.deviceSvc.GetCapabilityAsync(devID);
 
                 if (!capability.DisplaySupported)
                 {
                     Console.WriteLine("TNA service is not supported by the device {0}: {1}", devID, capability);
-                    tnaTest.connectSvc.Disconnect(devIDs);
+                    await tnaTest.connectSvc.Disconnect(devIDs);
                     gatewayClient.Close();
                     Environment.Exit(1);
                 }
@@ -72,7 +73,7 @@ namespace example
             catch (RpcException e)
             {
                 Console.WriteLine("Cannot get the device info: {0}", e);
-                tnaTest.connectSvc.Disconnect(devIDs);
+                await tnaTest.connectSvc.Disconnect(devIDs);
                 gatewayClient.Close();
                 Environment.Exit(1);
             }
@@ -82,15 +83,15 @@ namespace example
                 LogTest logTest = new LogTest(tnaTest.tnaSvc, tnaTest.eventSvc);
 
                 tnaTest.eventSvc.InitCodeMap(CODE_MAP_FILE);
-                tnaTest.eventSvc.StartMonitoring(devID);
-                tnaTest.eventSvc.SetCallback(logTest.EventCallback);
+                await tnaTest.eventSvc.StartMonitoringAsync(devID);
+                await tnaTest.eventSvc.SetCallback(logTest.EventCallback);
 
                 var origConfig = new ConfigTest(tnaTest.tnaSvc).Test(devID);
                 logTest.Test(devID);
 
                 tnaTest.tnaSvc.SetConfig(devID, origConfig);
 
-                tnaTest.eventSvc.StopMonitoring(devID);
+                await tnaTest.eventSvc.StopMonitoringAsync(devID);
             }
             catch (RpcException e)
             {
@@ -98,7 +99,7 @@ namespace example
             }
             finally
             {
-                tnaTest.connectSvc.Disconnect(devIDs);
+                await tnaTest.connectSvc.Disconnect(devIDs);
                 gatewayClient.Close();
             }
         }

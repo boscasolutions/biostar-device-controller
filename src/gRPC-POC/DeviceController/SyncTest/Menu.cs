@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -22,11 +23,11 @@ namespace example
 
             MenuItem[] items = new MenuItem[6];
 
-            items[0] = new MenuItem("1", "Show test devices", ShowTestDevice, false);
-            items[1] = new MenuItem("2", "Show new events", ShowNewEvent, false);
-            items[2] = new MenuItem("3", "Show new users", ShowNewUser, false);
-            items[3] = new MenuItem("4", "Enroll a user", EnrollUser, false);
-            items[4] = new MenuItem("5", "Delete a user", DeleteUser, false);
+            items[0] = new MenuItem("1", "Show test devices", ShowTestDeviceAsync, false);
+            items[1] = new MenuItem("2", "Show new events", ShowNewEventAsync, false);
+            items[2] = new MenuItem("3", "Show new users", ShowNewUserAsync, false);
+            items[3] = new MenuItem("4", "Enroll a user", EnrollUserAsync, false);
+            items[4] = new MenuItem("5", "Delete a user", DeleteUserAsync, false);
             items[5] = new MenuItem("q", "Quit", null, true);
 
             menu = new Menu(items);
@@ -37,15 +38,15 @@ namespace example
             menu.Show("Test Menu");
         }
 
-        public void ShowTestDevice()
+        public async Task ShowTestDeviceAsync()
         {
             Console.WriteLine("***** Test Configuration:" + Environment.NewLine + "{0}" + Environment.NewLine, testConfig.GetConfigData());
-            Console.WriteLine("***** Connected Devices: {0}", string.Join(", ", deviceMgr.GetConnectedDevices(true)));
+            Console.WriteLine("***** Connected Devices: {0}", string.Join(", ", await deviceMgr.GetConnectedDevicesAsync(true)));
         }
 
-        public void ShowNewEvent()
+        public async Task ShowNewEventAsync()
         {
-            var deviceIDs = deviceMgr.GetConnectedDevices(false);
+            var deviceIDs = await deviceMgr.GetConnectedDevicesAsync(false);
 
             foreach (uint devID in deviceIDs)
             {
@@ -78,15 +79,15 @@ namespace example
             }
         }
 
-        public void ShowNewUser()
+        public async Task ShowNewUserAsync()
         {
-            var deviceIDs = deviceMgr.GetConnectedDevices(false);
+            var deviceIDs = await deviceMgr.GetConnectedDevicesAsync(false);
 
             foreach (uint devID in deviceIDs)
             {
                 Console.WriteLine("Read new users from device {0}...", devID);
 
-                var userInfos = userMgr.GetNewUser(devID);
+                var userInfos = userMgr.GetNewUserAsync(devID);
                 if (userInfos != null)
                 {
                     Console.WriteLine("New users: {0}", userInfos);
@@ -104,14 +105,14 @@ namespace example
             return userInputs[0];
         }
 
-        public void EnrollUser()
+        public async Task EnrollUserAsync()
         {
-            userMgr.EnrollUser(GetUserID());
+            await userMgr.EnrollUserAsync(GetUserID());
         }
 
-        public void DeleteUser()
+        public async Task DeleteUserAsync()
         {
-            userMgr.DeleteUser(GetUserID());
+            await userMgr.DeleteUserAsync(GetUserID());
         }
 
     }

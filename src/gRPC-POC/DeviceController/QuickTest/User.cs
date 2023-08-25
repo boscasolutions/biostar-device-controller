@@ -3,6 +3,7 @@ using Gsdk.Face;
 using Gsdk.Finger;
 using Gsdk.User;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -21,7 +22,7 @@ namespace example
             this.faceSvc = faceSvc;
         }
 
-        public void Test(uint deviceID, CapabilityInfo capabilityInfo)
+        public async Task TestAsync(uint deviceID, CapabilityInfo capabilityInfo)
         {
             var userList = userSvc.GetList(deviceID);
 
@@ -34,7 +35,7 @@ namespace example
                 userIDs[i] = userList[i].ID;
             }
 
-            var users = userSvc.GetUser(deviceID, userIDs);
+            var users = await userSvc.GetUserAsync(deviceID, userIDs);
 
             for (int i = 0; i < users.Count; i++)
             {
@@ -52,33 +53,33 @@ namespace example
                 newUserIDs[i] = hdr.ID;
             }
 
-            userSvc.Enroll(deviceID, newUsers);
+            await userSvc.EnrollAsync(deviceID, newUsers);
 
             userList = userSvc.GetList(deviceID);
             Console.WriteLine("User list after enrolling new users: {0}" + Environment.NewLine, userList);
 
             if (capabilityInfo.FingerSupported)
             {
-                TestFinger(deviceID, newUserIDs[0]);
+                await TestFingerAsync(deviceID, newUserIDs[0]);
             }
 
             if (capabilityInfo.FaceSupported)
             {
-                TestFace(deviceID, newUserIDs[0]);
+                await TestFaceAsync(deviceID, newUserIDs[0]);
             }
 
-            userSvc.Delete(deviceID, newUserIDs);
+            await userSvc.DeleteAsync(deviceID, newUserIDs);
 
             userList = userSvc.GetList(deviceID);
             Console.WriteLine("User list after deleting new users: {0}" + Environment.NewLine, userList);
         }
 
-        private void TestFinger(uint deviceID, String userID)
+        private async Task TestFingerAsync(uint deviceID, String userID)
         {
             string[] userIDs = new string[1];
             userIDs[0] = userID;
 
-            var users = userSvc.GetUser(deviceID, userIDs);
+            var users = await userSvc.GetUserAsync(deviceID, userIDs);
             Console.WriteLine("User without fingerprint: {0}" + Environment.NewLine, users[0]);
 
             var userFingers = new UserFinger[1];
@@ -96,18 +97,18 @@ namespace example
 
             userFingers[0].Fingers.Add(fingerData);
 
-            userSvc.SetFinger(deviceID, userFingers);
+            await userSvc.SetFingerAsync(deviceID, userFingers);
 
-            users = userSvc.GetUser(deviceID, userIDs);
+            users = await userSvc.GetUserAsync(deviceID, userIDs);
             Console.WriteLine("User after adding fingerprints: {0}" + Environment.NewLine, users[0]);
         }
 
-        private void TestFace(uint deviceID, String userID)
+        private async Task TestFaceAsync(uint deviceID, String userID)
         {
             string[] userIDs = new string[1];
             userIDs[0] = userID;
 
-            var users = userSvc.GetUser(deviceID, userIDs);
+            var users = await userSvc.GetUserAsync(deviceID, userIDs);
             Console.WriteLine("User without face: {0}" + Environment.NewLine, users[0]);
 
             var userFaces = new UserFace[1];
@@ -118,11 +119,10 @@ namespace example
 
             userFaces[0].Faces.Add(faceData);
 
-            userSvc.SetFace(deviceID, userFaces);
+            await userSvc.SetFaceAsync(deviceID, userFaces);
 
-            users = userSvc.GetUser(deviceID, userIDs);
+            users = await userSvc.GetUserAsync(deviceID, userIDs);
             Console.WriteLine("User after adding faces: {0}" + Environment.NewLine, users[0]);
         }
     }
 }
-

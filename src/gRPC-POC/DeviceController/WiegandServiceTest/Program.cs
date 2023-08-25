@@ -1,6 +1,7 @@
 using Grpc.Core;
 using Gsdk.Connect;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -26,7 +27,7 @@ namespace example
             wiegandSvc = new WiegandSvc(gatewayClient.GetChannel());
         }
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             GatewayClient gatewayClient = null;
             WiegandTest wiegandTest = null;
@@ -40,7 +41,7 @@ namespace example
                 wiegandTest = new WiegandTest(gatewayClient);
 
                 var connectInfo = new ConnectInfo { IPAddr = DEVICE_ADDR, Port = DEVICE_PORT, UseSSL = USE_SSL };
-                devID = wiegandTest.connectSvc.Connect(connectInfo);
+                devID = await wiegandTest.connectSvc.ConnectAsync(connectInfo);
             }
             catch (RpcException e)
             {
@@ -62,7 +63,7 @@ namespace example
             }
             finally
             {
-                wiegandTest.connectSvc.Disconnect(devIDs);
+                await wiegandTest.connectSvc.Disconnect(devIDs);
                 gatewayClient.Close();
             }
         }

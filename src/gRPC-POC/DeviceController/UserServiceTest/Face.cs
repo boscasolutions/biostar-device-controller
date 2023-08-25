@@ -2,6 +2,7 @@ using Gsdk.Face;
 using Gsdk.User;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -16,7 +17,7 @@ namespace example
             this.userSvc = userSvc;
         }
 
-        public void Test(uint deviceID, string userID)
+        public async Task TestAsync(uint deviceID, string userID)
         {
             Console.WriteLine(Environment.NewLine + "===== Face Test =====" + Environment.NewLine);
 
@@ -26,7 +27,7 @@ namespace example
 
             var userFace = new UserFace { UserID = userID };
             userFace.Faces.Add(faceData);
-            userSvc.SetFace(deviceID, new UserFace[] { userFace });
+            await userSvc.SetFaceAsync(deviceID, new UserFace[] { userFace });
 
             // save the files for the test:
             string FACE_DATA_PATH = @"c:\facedata\";

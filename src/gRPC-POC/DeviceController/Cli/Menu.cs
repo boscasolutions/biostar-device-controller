@@ -1,6 +1,6 @@
 namespace example
 {
-    public delegate void MenuCallback();
+    public delegate Task MenuCallback();
 
     public class MenuItem
     {

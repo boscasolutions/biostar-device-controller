@@ -4,16 +4,16 @@ namespace example
 {
     public class GrpcClient
     {
-        protected Channel channel;
+        protected Channel? _channel;
 
         public Channel GetChannel()
         {
-            return channel;
+            return _channel;
         }
 
         public void Close()
         {
-            channel.ShutdownAsync().Wait();
+            _channel.ShutdownAsync().Wait();
         }
     }
 
@@ -23,7 +23,7 @@ namespace example
         {
             var channelCredentials = new SslCredentials(File.ReadAllText(caFile));
 
-            channel = new Channel(serverAddr, serverPort, channelCredentials);
+            _channel = new Channel(serverAddr, serverPort, channelCredentials);
         }
     }
 }

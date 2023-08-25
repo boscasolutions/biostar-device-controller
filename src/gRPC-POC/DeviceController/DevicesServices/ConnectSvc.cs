@@ -15,51 +15,51 @@ namespace example
             connectClient = new Connect.ConnectClient(channel);
         }
 
-        public RepeatedField<DeviceInfo> GetDeviceList()
+        public async Task<RepeatedField<DeviceInfo>> GetDeviceListAsync()
         {
             var request = new GetDeviceListRequest { };
-            var response = connectClient.GetDeviceList(request);
+            var response = await connectClient.GetDeviceListAsync(request);
 
             return response.DeviceInfos;
         }
 
-        public RepeatedField<SearchDeviceInfo> SearchDevice()
+        public async Task<RepeatedField<SearchDeviceInfo>> SearchDeviceAsync()
         {
             var request = new SearchDeviceRequest { Timeout = SEARCH_TIMEOUT_MS };
-            var response = connectClient.SearchDevice(request);
+            var response = await connectClient.SearchDeviceAsync(request);
 
             return response.DeviceInfos;
         }
 
-        public uint Connect(ConnectInfo connectInfo)
+        public async Task<uint> ConnectAsync(ConnectInfo connectInfo)
         {
             var request = new ConnectRequest { ConnectInfo = connectInfo };
-            var response = connectClient.Connect(request);
+            var response = await connectClient.ConnectAsync(request);
 
             return response.DeviceID;
         }
 
-        public void Disconnect(uint[] deviceIDs)
+        public async Task Disconnect(uint[] deviceIDs)
         {
             var request = new DisconnectRequest { };
             request.DeviceIDs.AddRange(deviceIDs);
 
-            connectClient.Disconnect(request);
+            await connectClient.DisconnectAsync(request);
         }
 
-        public void DisconnectAll()
+        public async Task DisconnectAllAsync()
         {
             var request = new DisconnectAllRequest { };
 
-            connectClient.DisconnectAll(request);
+            await connectClient.DisconnectAllAsync(request);
         }
 
-        public void AddAsyncConnection(AsyncConnectInfo[] asyncConns)
+        public async Task AddAsyncConnectionAsync(AsyncConnectInfo[] asyncConns)
         {
             var request = new AddAsyncConnectionRequest { };
             request.ConnectInfos.AddRange(asyncConns);
 
-            connectClient.AddAsyncConnection(request);
+            await connectClient.AddAsyncConnectionAsync(request);
         }
 
         public void DeleteAsyncConnection(uint[] deviceIDs)
@@ -70,53 +70,53 @@ namespace example
             connectClient.DeleteAsyncConnection(request);
         }
 
-        public RepeatedField<PendingDeviceInfo> GetPendingList()
+        public async Task<RepeatedField<PendingDeviceInfo>> GetPendingListAsync()
         {
             var request = new GetPendingListRequest { };
-            var response = connectClient.GetPendingList(request);
+            var response = await connectClient.GetPendingListAsync(request);
 
             return response.DeviceInfos;
         }
 
-        public AcceptFilter GetAcceptFilter()
+        public async Task<AcceptFilter> GetAcceptFilterAsync()
         {
             var request = new GetAcceptFilterRequest { };
-            var response = connectClient.GetAcceptFilter(request);
+            var response = await connectClient.GetAcceptFilterAsync(request);
 
             return response.Filter;
         }
 
-        public void SetAcceptFilter(AcceptFilter filter)
+        public async Task SetAcceptFilterAsync(AcceptFilter filter)
         {
             var request = new SetAcceptFilterRequest { Filter = filter };
-            connectClient.SetAcceptFilter(request);
+            await connectClient.SetAcceptFilterAsync(request);
         }
 
-        public void SetConnectionMode(uint[] deviceIDs, ConnectionMode mode)
+        public async Task SetConnectionModeAsync(uint[] deviceIDs, ConnectionMode mode)
         {
             var request = new SetConnectionModeMultiRequest { ConnectionMode = mode };
             request.DeviceIDs.AddRange(deviceIDs);
 
-            connectClient.SetConnectionModeMulti(request);
+            await connectClient.SetConnectionModeMultiAsync(request);
         }
 
-        public void EnableSSL(uint[] deviceIDs)
+        public async Task EnableSSLAsync(uint[] deviceIDs)
         {
             var request = new EnableSSLMultiRequest { };
             request.DeviceIDs.AddRange(deviceIDs);
 
-            connectClient.EnableSSLMulti(request);
+            await connectClient.EnableSSLMultiAsync(request);
         }
 
-        public void DisableSSL(uint[] deviceIDs)
+        public async Task DisableSSLAsync(uint[] deviceIDs)
         {
             var request = new DisableSSLMultiRequest { };
             request.DeviceIDs.AddRange(deviceIDs);
 
-            connectClient.DisableSSLMulti(request);
+            await connectClient.DisableSSLMultiAsync(request);
         }
 
-        public IAsyncStreamReader<StatusChange> Subscribe(int queueSize)
+        public async Task<IAsyncStreamReader<StatusChange>> SubscribeAsync(int queueSize)
         {
             var request = new SubscribeStatusRequest { QueueSize = queueSize };
             var streamCall = connectClient.SubscribeStatus(request);

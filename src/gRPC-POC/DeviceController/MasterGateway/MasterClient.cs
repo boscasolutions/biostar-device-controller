@@ -13,9 +13,9 @@ namespace example
             var channelCredentials = new SslCredentials(File.ReadAllText(caFile), new KeyCertificatePair(File.ReadAllText(adminCertFile), File.ReadAllText(adminKeyFile)));
             var callCredentials = CallCredentials.FromInterceptor(JwtCredential.JwtAuthInterceptor);
 
-            channel = new Channel(masterAddr, masterPort, ChannelCredentials.Create(channelCredentials, callCredentials));
+            _channel = new Channel(masterAddr, masterPort, ChannelCredentials.Create(channelCredentials, callCredentials));
 
-            var loginClient = new Login.LoginClient(channel);
+            var loginClient = new Login.LoginClient(_channel);
 
             var request = new LoginAdminRequest { AdminTenantCert = File.ReadAllText(adminCertFile), TenantID = ADMIN_TENANT_ID };
             var response = loginClient.LoginAdmin(request);
@@ -25,7 +25,7 @@ namespace example
 
         public void InitTenant(string tenantID, string gatewayID)
         {
-            var tenantClient = new Tenant.TenantClient(channel);
+            var tenantClient = new Tenant.TenantClient(_channel);
 
             var getRequest = new GetRequest { };
             getRequest.TenantIDs.Add(tenantID);
@@ -62,9 +62,9 @@ namespace example
             var channelCredentials = new SslCredentials(File.ReadAllText(caFile), new KeyCertificatePair(File.ReadAllText(tenantCertFile), File.ReadAllText(tenantKeyFile)));
             var callCredentials = CallCredentials.FromInterceptor(JwtCredential.JwtAuthInterceptor);
 
-            channel = new Channel(masterAddr, masterPort, ChannelCredentials.Create(channelCredentials, callCredentials));
+            _channel = new Channel(masterAddr, masterPort, ChannelCredentials.Create(channelCredentials, callCredentials));
 
-            var loginClient = new Login.LoginClient(channel);
+            var loginClient = new Login.LoginClient(_channel);
 
             var request = new LoginRequest { TenantCert = File.ReadAllText(tenantCertFile) };
             var response = loginClient.Login(request);

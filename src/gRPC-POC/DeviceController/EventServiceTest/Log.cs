@@ -20,7 +20,7 @@ namespace example
         public void Test(uint deviceID)
         {
             eventSvc.InitCodeMap(CODE_MAP_FILE);
-            eventSvc.StartMonitoring(deviceID);
+            eventSvc.StartMonitoringAsync(deviceID);
             eventSvc.SetCallback(EventCallback);
 
             Console.WriteLine(Environment.NewLine + "===== Event Test =====" + Environment.NewLine);
@@ -55,7 +55,7 @@ namespace example
                 }
             }
 
-            eventSvc.StopMonitoring(deviceID);
+            eventSvc.StopMonitoringAsync(deviceID);
         }
 
         private void PrintEvent(EventLog logEvent)

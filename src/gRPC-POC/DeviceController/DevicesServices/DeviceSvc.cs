@@ -20,10 +20,10 @@ namespace example
             return response.Info;
         }
 
-        public DeviceCapability GetCapability(uint deviceID)
+        public async Task<DeviceCapability> GetCapabilityAsync(uint deviceID)
         {
             var request = new GetCapabilityRequest { DeviceID = deviceID };
-            var response = deviceClient.GetCapability(request);
+            var response = await deviceClient.GetCapabilityAsync(request);
 
             return response.DeviceCapability;
         }

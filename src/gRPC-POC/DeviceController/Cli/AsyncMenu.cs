@@ -12,28 +12,28 @@ namespace example
             connectSvc = svc;
 
             MenuItem[] items = new MenuItem[4];
-            items[0] = new MenuItem("1", "Add async connections", AddAsyncConnection, false);
-            items[1] = new MenuItem("2", "Delete async connections", DeleteAsyncConnection, false);
+            items[0] = new MenuItem("1", "Add async connections", AddAsyncConnectionAsync, false);
+            items[1] = new MenuItem("2", "Delete async connections", DeleteAsyncConnectionAsync, false);
             items[2] = new MenuItem("3", "Refresh the connection list", ShowAsyncConnection, false);
             items[3] = new MenuItem("q", "Return to Main Menu", null, true);
 
             menu = new Menu(items);
         }
 
-        public void Show()
+        public async Task Show()
         {
-            ShowAsyncConnection();
+            await ShowAsyncConnection();
 
             menu.Show("Async Menu");
         }
 
-        public void ShowAsyncConnection()
+        public async Task ShowAsyncConnection()
         {
             Console.WriteLine("Getting the async connections...");
 
             try
             {
-                var devList = connectSvc.GetDeviceList();
+                var devList = await connectSvc.GetDeviceListAsync();
                 var asyncConns = new List<DeviceInfo>();
 
                 for (int i = 0; i < devList.Count; i++)
@@ -59,7 +59,7 @@ namespace example
             }
         }
 
-        public void AddAsyncConnection()
+        public async Task AddAsyncConnectionAsync()
         {
             List<AsyncConnectInfo> asyncConns = new List<AsyncConnectInfo>();
 
@@ -101,8 +101,8 @@ namespace example
             try
             {
                 Console.WriteLine("Adding async connections...");
-                connectSvc.AddAsyncConnection(asyncConns.ToArray());
-                ShowAsyncConnection();
+                await connectSvc.AddAsyncConnectionAsync(asyncConns.ToArray());
+                await ShowAsyncConnection();
             }
             catch (Exception e)
             {
@@ -110,7 +110,7 @@ namespace example
             }
         }
 
-        public void DeleteAsyncConnection()
+        public async Task DeleteAsyncConnectionAsync()
         {
             uint[] deviceIDs = Menu.GetDeviceIDs();
 
@@ -123,7 +123,7 @@ namespace example
             {
                 Console.WriteLine("Deleting async connections...");
                 connectSvc.DeleteAsyncConnection(deviceIDs);
-                ShowAsyncConnection();
+                await ShowAsyncConnection();
             }
             catch (Exception e)
             {

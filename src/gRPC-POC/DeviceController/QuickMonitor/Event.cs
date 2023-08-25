@@ -15,12 +15,12 @@ namespace example
 
         public void Test(uint[] deviceIDs)
         {
-            eventSvc.StartMonitoringMulti(deviceIDs);
+            eventSvc.StartMonitoringMultiAsync(deviceIDs);
 
             Console.WriteLine(">>> Generate real-time events for 20 seconds");
             Thread.Sleep(20000);
 
-            eventSvc.StopMonitoringMulti(deviceIDs);
+            eventSvc.StopMonitoringMultiAsync(deviceIDs);
         }
     }
 }

@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Type = Gsdk.Card.Type;
 
 namespace example
@@ -32,7 +33,7 @@ namespace example
             this.userSvc = userSvc;
         }
 
-        public void Test(uint deviceID, string userID)
+        public async Task TestAsync(uint deviceID, string userID)
         {
             Console.WriteLine(Environment.NewLine + "===== Card Token Test =====" + Environment.NewLine);
 
@@ -63,18 +64,18 @@ namespace example
             
             userCard.Cards.Add(cardData.CSNCardData);
             
-            userSvc.SetCard(deviceID, new UserCard[] { userCard });
+            await userSvc.SetCardAsync(deviceID, new UserCard[] { userCard });
 
-            var newUserInfo = userSvc.GetUser(deviceID, new string[] { userID });            
+            var newUserInfo = await userSvc.GetUserAsync(deviceID, new string[] { userID });            
             
             Console.WriteLine("card data:{0}", newUserInfo.FirstOrDefault().Cards[0].Data.ToString());
 
             KeyInput.PressEnter(">> Press ENTER to end the test." + Environment.NewLine);
         }
 
-        public void GetUserInfoTest(uint deviceID, string userID)
+        public async Task GetUserInfoTestAsync(uint deviceID, string userID)
         {
-            var newUserInfo = userSvc.GetUser(deviceID, new string[] { userID });
+            var newUserInfo = await userSvc.GetUserAsync(deviceID, new string[] { userID });
 
             Console.WriteLine("card data:{0}", newUserInfo.FirstOrDefault().Cards[0].Data.ToString());
 

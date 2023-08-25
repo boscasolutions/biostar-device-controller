@@ -15,108 +15,108 @@ namespace example
             connectMasterClient = new ConnectMaster.ConnectMasterClient(channel);
         }
 
-        public RepeatedField<Gsdk.Connect.DeviceInfo> GetDeviceList(string gatewayID)
+        public async Task<RepeatedField<Gsdk.Connect.DeviceInfo>> GetDeviceListAsync(string gatewayID)
         {
             var request = new GetDeviceListRequest { GatewayID = gatewayID };
-            var response = connectMasterClient.GetDeviceList(request);
+            var response = await connectMasterClient.GetDeviceListAsync(request);
 
             return response.DeviceInfos;
         }
 
-        public RepeatedField<Gsdk.Connect.SearchDeviceInfo> SearchDevice(string gatewayID)
+        public async Task<RepeatedField<Gsdk.Connect.SearchDeviceInfo>> SearchDeviceAsync(string gatewayID)
         {
             var request = new SearchDeviceRequest { GatewayID = gatewayID, Timeout = SEARCH_TIMEOUT_MS };
-            var response = connectMasterClient.SearchDevice(request);
+            var response = await connectMasterClient.SearchDeviceAsync(request);
 
             return response.DeviceInfos;
         }
 
-        public uint Connect(string gatewayID, Gsdk.Connect.ConnectInfo connectInfo)
+        public async Task<uint> ConnectAsync(string gatewayID, Gsdk.Connect.ConnectInfo connectInfo)
         {
             var request = new ConnectRequest { GatewayID = gatewayID, ConnectInfo = connectInfo };
-            var response = connectMasterClient.Connect(request);
+            var response = await connectMasterClient.ConnectAsync(request);
 
             return response.DeviceID;
         }
 
-        public void Disconnect(uint[] deviceIDs)
+        public async Task DisconnectAsync(uint[] deviceIDs)
         {
             var request = new DisconnectRequest { };
             request.DeviceIDs.AddRange(deviceIDs);
 
-            connectMasterClient.Disconnect(request);
+            await connectMasterClient.DisconnectAsync(request);
         }
 
-        public void DisconnectAll(string gatewayID)
+        public async Task DisconnectAllAsync(string gatewayID)
         {
             var request = new DisconnectAllRequest { GatewayID = gatewayID };
 
-            connectMasterClient.DisconnectAll(request);
+            await connectMasterClient.DisconnectAllAsync(request);
         }
 
-        public void AddAsyncConnection(string gatewayID, Gsdk.Connect.AsyncConnectInfo[] asyncConns)
+        public async Task AddAsyncConnectionAsync(string gatewayID, Gsdk.Connect.AsyncConnectInfo[] asyncConns)
         {
             var request = new AddAsyncConnectionRequest { GatewayID = gatewayID };
             request.ConnectInfos.AddRange(asyncConns);
 
-            connectMasterClient.AddAsyncConnection(request);
+            await connectMasterClient.AddAsyncConnectionAsync(request);
         }
 
-        public void DeleteAsyncConnection(string gatewayID, uint[] deviceIDs)
+        public async Task DeleteAsyncConnectionAsync(string gatewayID, uint[] deviceIDs)
         {
             var request = new DeleteAsyncConnectionRequest { GatewayID = gatewayID };
             request.DeviceIDs.AddRange(deviceIDs);
 
-            connectMasterClient.DeleteAsyncConnection(request);
+            await connectMasterClient.DeleteAsyncConnectionAsync(request);
         }
 
-        public RepeatedField<Gsdk.Connect.PendingDeviceInfo> GetPendingList(string gatewayID)
+        public async Task<RepeatedField<Gsdk.Connect.PendingDeviceInfo>> GetPendingListAsync(string gatewayID)
         {
             var request = new GetPendingListRequest { GatewayID = gatewayID };
-            var response = connectMasterClient.GetPendingList(request);
+            var response = await connectMasterClient.GetPendingListAsync(request);
 
             return response.DeviceInfos;
         }
 
-        public Gsdk.Connect.AcceptFilter GetAcceptFilter(string gatewayID)
+        public async Task<Gsdk.Connect.AcceptFilter> GetAcceptFilterAsync(string gatewayID)
         {
             var request = new GetAcceptFilterRequest { GatewayID = gatewayID };
-            var response = connectMasterClient.GetAcceptFilter(request);
+            var response = await connectMasterClient.GetAcceptFilterAsync(request);
 
             return response.Filter;
         }
 
-        public void SetAcceptFilter(string gatewayID, Gsdk.Connect.AcceptFilter filter)
+        public async Task SetAcceptFilterAsync(string gatewayID, Gsdk.Connect.AcceptFilter filter)
         {
             var request = new SetAcceptFilterRequest { GatewayID = gatewayID, Filter = filter };
-            connectMasterClient.SetAcceptFilter(request);
+            await connectMasterClient.SetAcceptFilterAsync(request);
         }
 
-        public void SetConnectionMode(uint[] deviceIDs, Gsdk.Connect.ConnectionMode mode)
+        public async Task SetConnectionModeAsync(uint[] deviceIDs, Gsdk.Connect.ConnectionMode mode)
         {
             var request = new SetConnectionModeMultiRequest { ConnectionMode = mode };
             request.DeviceIDs.AddRange(deviceIDs);
 
-            connectMasterClient.SetConnectionModeMulti(request);
+            await connectMasterClient.SetConnectionModeMultiAsync(request);
         }
 
-        public void EnableSSL(uint[] deviceIDs)
+        public async Task EnableSSLAsync(uint[] deviceIDs)
         {
             var request = new EnableSSLMultiRequest { };
             request.DeviceIDs.AddRange(deviceIDs);
 
-            connectMasterClient.EnableSSLMulti(request);
+            await connectMasterClient.EnableSSLMultiAsync(request);
         }
 
-        public void DisableSSL(uint[] deviceIDs)
+        public async Task DisableSSLAsync(uint[] deviceIDs)
         {
             var request = new DisableSSLMultiRequest { };
             request.DeviceIDs.AddRange(deviceIDs);
 
-            connectMasterClient.DisableSSLMulti(request);
+            await connectMasterClient.DisableSSLMultiAsync(request);
         }
 
-        public IAsyncStreamReader<Gsdk.Connect.StatusChange> Subscribe(int queueSize)
+        public async Task<IAsyncStreamReader<Gsdk.Connect.StatusChange>> SubscribeAsync(int queueSize)
         {
             var request = new SubscribeStatusRequest { QueueSize = queueSize };
             var streamCall = connectMasterClient.SubscribeStatus(request);

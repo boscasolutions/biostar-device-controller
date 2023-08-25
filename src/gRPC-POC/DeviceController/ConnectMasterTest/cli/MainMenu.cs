@@ -1,5 +1,6 @@
 using Gsdk.Connect;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -18,11 +19,11 @@ namespace example
             gatewayID = id;
 
             MenuItem[] items = new MenuItem[6];
-            items[0] = new MenuItem("1", "Search devices", SearchDevice, false);
-            items[1] = new MenuItem("2", "Connect to a device synchronously", ConnectToDevice, false);
-            items[2] = new MenuItem("3", "Manage asynchronous connections", ShowAsyncMenu, false);
-            items[3] = new MenuItem("4", "Accept devices", ShowAcceptMenu, false);
-            items[4] = new MenuItem("5", "Device menu", ShowDeviceMenu, false);
+            items[0] = new MenuItem("1", "Search devices", SearchDeviceAsync, false);
+            items[1] = new MenuItem("2", "Connect to a device synchronously", ConnectToDeviceAsync, false);
+            items[2] = new MenuItem("3", "Manage asynchronous connections", ShowAsyncMenuAsync, false);
+            items[3] = new MenuItem("4", "Accept devices", ShowAcceptMenuAsync, false);
+            items[4] = new MenuItem("5", "Device menu", ShowDeviceMenuAsync, false);
             items[5] = new MenuItem("q", "Quit", null, true);
 
             menu = new Menu(items);
@@ -37,13 +38,13 @@ namespace example
             menu.Show("Main Menu");
         }
 
-        public void SearchDevice()
+        public async Task SearchDeviceAsync()
         {
             Console.WriteLine("Searching devices in the subnet...");
 
             try
             {
-                var devList = connectMasterSvc.SearchDevice(gatewayID);
+                var devList = await connectMasterSvc.SearchDeviceAsync(gatewayID);
 
                 Console.WriteLine();
                 Console.WriteLine("***** Found Devices: {0}", devList.Count);
@@ -60,7 +61,7 @@ namespace example
             }
         }
 
-        public void ConnectToDevice()
+        public async Task ConnectToDeviceAsync()
         {
             var connInfo = GetConnectInfo();
 
@@ -70,7 +71,7 @@ namespace example
                 {
                     Console.WriteLine("Connecting to the device...");
 
-                    uint devID = connectMasterSvc.Connect(gatewayID, connInfo);
+                    uint devID = await connectMasterSvc.ConnectAsync(gatewayID, connInfo);
                     Console.WriteLine("Connected to {0}", devID);
                 }
                 catch (Exception e)
@@ -80,19 +81,19 @@ namespace example
             }
         }
 
-        public void ShowDeviceMenu()
+        public async Task ShowDeviceMenuAsync()
         {
-            deviceMenu.Show();
+            await deviceMenu.ShowAsync();
         }
 
-        public void ShowAsyncMenu()
+        public async Task ShowAsyncMenuAsync()
         {
-            asyncMenu.Show();
+            await asyncMenu.ShowAsync();
         }
 
-        public void ShowAcceptMenu()
+        public async Task ShowAcceptMenuAsync()
         {
-            acceptMenu.Show();
+            await acceptMenu.ShowAsync();
         }
 
         public static ConnectInfo GetConnectInfo()

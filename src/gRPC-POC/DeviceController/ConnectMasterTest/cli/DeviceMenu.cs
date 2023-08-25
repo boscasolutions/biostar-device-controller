@@ -1,5 +1,6 @@
 using Gsdk.Connect;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -15,20 +16,20 @@ namespace example
             gatewayID = id;
 
             MenuItem[] items = new MenuItem[7];
-            items[0] = new MenuItem("1", "Set connection mode", SetConnectionMode, false);
-            items[1] = new MenuItem("2", "Enable SSL", EnableSSL, false);
-            items[2] = new MenuItem("3", "Disable SSL", DisableSSL, false);
-            items[3] = new MenuItem("4", "Disconnect devices", Disconnect, false);
-            items[4] = new MenuItem("5", "Disconnect all devices", DisconnectAll, false);
-            items[5] = new MenuItem("6", "Refresh the managed device list", ShowDeviceList, false);
+            items[0] = new MenuItem("1", "Set connection mode", SetConnectionModeAsync, false);
+            items[1] = new MenuItem("2", "Enable SSL", EnableSSLAsync, false);
+            items[2] = new MenuItem("3", "Disable SSL", DisableSSLAsync, false);
+            items[3] = new MenuItem("4", "Disconnect devices", DisconnectAsync, false);
+            items[4] = new MenuItem("5", "Disconnect all devices", DisconnectAllAsync, false);
+            items[5] = new MenuItem("6", "Refresh the managed device list", ShowDeviceListAsync, false);
             items[6] = new MenuItem("q", "Return to Main Menu", null, true);
 
             menu = new Menu(items);
         }
 
-        public void Show()
+        public async Task ShowAsync()
         {
-            if (GetDeviceList() == 0)
+            if (await GetDeviceListAsync() == 0)
             {
                 Console.WriteLine("No connected device. Please connect to some devices first.");
                 return;
@@ -37,13 +38,13 @@ namespace example
             menu.Show("Device Menu");
         }
 
-        public int GetDeviceList()
+        public async Task<int> GetDeviceListAsync()
         {
             Console.WriteLine("Getting the devices managed by the gateway...");
 
             try
             {
-                var devList = connectMasterSvc.GetDeviceList(gatewayID);
+                var devList = await connectMasterSvc.GetDeviceListAsync(gatewayID);
 
                 Console.WriteLine();
                 Console.WriteLine("***** Managed Devices: {0}", devList.Count);
@@ -63,12 +64,12 @@ namespace example
             }
         }
 
-        public void ShowDeviceList()
+        public async Task ShowDeviceListAsync()
         {
-            GetDeviceList();
+            await GetDeviceListAsync();
         }
 
-        public void SetConnectionMode()
+        public async Task SetConnectionModeAsync()
         {
             Console.WriteLine("Enter the device IDs to to change the connection mode");
 
@@ -97,7 +98,7 @@ namespace example
 
             try
             {
-                connectMasterSvc.SetConnectionMode(deviceIDs, (ConnectionMode)mode);
+                await connectMasterSvc.SetConnectionModeAsync(deviceIDs, (ConnectionMode)mode);
             }
             catch (Exception e)
             {
@@ -107,7 +108,7 @@ namespace example
 
 
 
-        public void EnableSSL()
+        public async Task EnableSSLAsync()
         {
             Console.WriteLine("Enter the device IDs to enable");
 
@@ -122,7 +123,7 @@ namespace example
 
             try
             {
-                connectMasterSvc.EnableSSL(deviceIDs);
+                await connectMasterSvc.EnableSSLAsync(deviceIDs);
             }
             catch (Exception e)
             {
@@ -130,7 +131,7 @@ namespace example
             }
         }
 
-        public void DisableSSL()
+        public async Task DisableSSLAsync()
         {
             Console.WriteLine("Enter the device IDs to disable");
 
@@ -145,7 +146,7 @@ namespace example
 
             try
             {
-                connectMasterSvc.DisableSSL(deviceIDs);
+                await connectMasterSvc.DisableSSLAsync(deviceIDs);
             }
             catch (Exception e)
             {
@@ -153,7 +154,7 @@ namespace example
             }
         }
 
-        public void Disconnect()
+        public async Task DisconnectAsync()
         {
             Console.WriteLine("Enter the device IDs to disconnect");
 
@@ -168,7 +169,7 @@ namespace example
 
             try
             {
-                connectMasterSvc.Disconnect(deviceIDs);
+                await connectMasterSvc.DisconnectAsync(deviceIDs);
             }
             catch (Exception e)
             {
@@ -176,13 +177,13 @@ namespace example
             }
         }
 
-        public void DisconnectAll()
+        public async Task DisconnectAllAsync()
         {
             Console.WriteLine("Disconnecting all devices...");
 
             try
             {
-                connectMasterSvc.DisconnectAll(gatewayID);
+                await connectMasterSvc.DisconnectAllAsync(gatewayID);
             }
             catch (Exception e)
             {

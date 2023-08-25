@@ -1,5 +1,6 @@
 using Gsdk.Connect;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -12,16 +13,16 @@ namespace example
             connectSvc = svc;
         }
 
-        public uint Test(string deviceAddr, int port, bool useSSL)
+        public async Task<uint> TestAsync(string deviceAddr, int port, bool useSSL)
         {
-            var devList = connectSvc.GetDeviceList();
+            var devList = await connectSvc.GetDeviceListAsync();
 
             Console.WriteLine("Device list before connection: {0}" + Environment.NewLine, devList);
 
             var connectInfo = new ConnectInfo { IPAddr = deviceAddr, Port = port, UseSSL = useSSL };
-            var devID = connectSvc.Connect(connectInfo);
+            var devID = await connectSvc.ConnectAsync(connectInfo);
 
-            devList = connectSvc.GetDeviceList();
+            devList = await connectSvc.GetDeviceListAsync();
 
             Console.WriteLine("Device list after connection: {0}" + Environment.NewLine, devList);
 
@@ -38,16 +39,16 @@ namespace example
             connectMasterSvc = svc;
         }
 
-        public uint Test(string gatewayID, string deviceAddr, int port, bool useSSL)
+        public async Task<uint> TestAsync(string gatewayID, string deviceAddr, int port, bool useSSL)
         {
-            var devList = connectMasterSvc.GetDeviceList(gatewayID);
+            var devList = await connectMasterSvc.GetDeviceListAsync(gatewayID);
 
             Console.WriteLine("Device list before connection: {0}" + Environment.NewLine, devList);
 
             var connectInfo = new ConnectInfo { IPAddr = deviceAddr, Port = port, UseSSL = useSSL };
-            var devID = connectMasterSvc.Connect(gatewayID, connectInfo);
+            var devID = await connectMasterSvc.ConnectAsync(gatewayID, connectInfo);
 
-            devList = connectMasterSvc.GetDeviceList(gatewayID);
+            devList = await connectMasterSvc.GetDeviceListAsync(gatewayID);
 
             Console.WriteLine("Device list after connection: {0}" + Environment.NewLine, devList);
 
@@ -55,4 +56,3 @@ namespace example
         }
     }
 }
-

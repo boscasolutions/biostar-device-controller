@@ -1,5 +1,6 @@
 using Grpc.Core;
 using Gsdk.Connect;
+using System.Runtime.CompilerServices;
 
 namespace example
 {
@@ -17,11 +18,11 @@ namespace example
 
             MenuItem[] items = new MenuItem[7];
             items[0] = new MenuItem("1", "Search devices", SearchDevice, false);
-            items[1] = new MenuItem("2", "Connect to a device synchronously", ConnectToDevice, false);
+            items[1] = new MenuItem("2", "Connect to a device synchronously", ConnectToDeviceAsync, false);
             items[2] = new MenuItem("3", "Manage asynchronous connections", ShowAsyncMenu, false);
-            items[3] = new MenuItem("4", "Accept devices", ShowAcceptMenu, false);
-            items[4] = new MenuItem("5", "Device menu", ShowDeviceMenu, false);
-            items[5] = new MenuItem("6", "Events", StreamEvents, false);
+            items[3] = new MenuItem("4", "Accept devices", ShowAcceptMenuAsync, false);
+            items[4] = new MenuItem("5", "Device menu", ShowDeviceMenuAsync, false);
+            items[5] = new MenuItem("6", "Events", StreamEventsAsync, false);
             items[6] = new MenuItem("q", "Quit", null, true);
 
             menu = new Menu(items);
@@ -36,13 +37,13 @@ namespace example
             menu.Show("Main Menu");
         }
 
-        public void SearchDevice()
+        public async Task SearchDevice()
         {
             Console.WriteLine("Searching devices in the subnet...");
 
             try
             {
-                var devList = connectSvc.SearchDevice();
+                var devList = await connectSvc.SearchDeviceAsync();
 
                 Console.WriteLine();
                 Console.WriteLine("***** Found Devices: {0}", devList.Count);
@@ -59,7 +60,7 @@ namespace example
             }
         }
 
-        public void ConnectToDevice()
+        public async Task ConnectToDeviceAsync()
         {
             var connInfo = GetConnectInfo();
 
@@ -69,7 +70,7 @@ namespace example
                 {
                     Console.WriteLine("Connecting to the device...");
 
-                    uint devID = connectSvc.Connect(connInfo);
+                    uint devID = await connectSvc.ConnectAsync(connInfo);
                     Console.WriteLine("Connected to {0}", devID);
                 }
                 catch (Exception e)
@@ -79,10 +80,10 @@ namespace example
             }
         }
 
-        public void StreamEvents()
+        public async Task StreamEventsAsync()
         {
             var connInfo = GetConnectInfo();
-            uint devID = connectSvc.Connect(connInfo);
+            uint devID = await connectSvc.ConnectAsync(connInfo);
 
             GatewayClient gatewayClient = new GatewayClient();
             
@@ -94,7 +95,7 @@ namespace example
             {
                 LogCli logTest = new LogCli(eventSvc);
 
-                logTest.EventsLoggger(devID);
+                await logTest.EventsLogggerAsync(devID);
             }
             catch (RpcException e)
             {
@@ -102,24 +103,24 @@ namespace example
             }
             finally
             {
-                connectSvc.Disconnect(devIDs);
+                await connectSvc.Disconnect(devIDs);
                 gatewayClient.Close();
             }
         }
 
-        public void ShowDeviceMenu()
+        public async Task ShowDeviceMenuAsync()
         {
-            deviceMenu.Show();
+            await deviceMenu.ShowAsync();
         }
 
-        public void ShowAsyncMenu()
+        public async Task ShowAsyncMenu()
         {
-            asyncMenu.Show();
+            await asyncMenu.Show();
         }
 
-        public void ShowAcceptMenu()
+        public async Task ShowAcceptMenuAsync()
         {
-            acceptMenu.Show();
+            await acceptMenu.ShowAsync();
         }
 
         public static ConnectInfo GetConnectInfo()

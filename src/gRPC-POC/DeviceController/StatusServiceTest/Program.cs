@@ -2,6 +2,7 @@ using Grpc.Core;
 using Gsdk.Connect;
 using Gsdk.Device;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -29,7 +30,7 @@ namespace example
             deviceSvc = new DeviceSvc(gatewayClient.GetChannel());
         }
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             GatewayClient gatewayClient = null;
             StatusTest statusTest = null;
@@ -43,7 +44,7 @@ namespace example
                 statusTest = new StatusTest(gatewayClient);
 
                 var connectInfo = new ConnectInfo { IPAddr = DEVICE_ADDR, Port = DEVICE_PORT, UseSSL = USE_SSL };
-                devID = statusTest.connectSvc.Connect(connectInfo);
+                devID = await statusTest.connectSvc.ConnectAsync(connectInfo);
             }
             catch (RpcException e)
             {
@@ -56,12 +57,12 @@ namespace example
 
             try
             {
-                DeviceCapability capability = statusTest.deviceSvc.GetCapability(devID);
+                DeviceCapability capability = await statusTest.deviceSvc.GetCapabilityAsync(devID);
 
                 if (capability.DisplaySupported)
                 {
                     Console.WriteLine("Status configuration is effective only for headless devices: {0}", capability.DisplaySupported);
-                    statusTest.connectSvc.Disconnect(devIDs);
+                    await statusTest.connectSvc.Disconnect(devIDs);
                     gatewayClient.Close();
                     Environment.Exit(1);
                 }
@@ -69,7 +70,7 @@ namespace example
             catch (RpcException e)
             {
                 Console.WriteLine("Cannot get the device info: {0}", e);
-                statusTest.connectSvc.Disconnect(devIDs);
+                await statusTest.connectSvc.Disconnect(devIDs);
                 gatewayClient.Close();
                 Environment.Exit(1);
             }
@@ -84,7 +85,7 @@ namespace example
             }
             finally
             {
-                statusTest.connectSvc.Disconnect(devIDs);
+                await statusTest.connectSvc.Disconnect(devIDs);
                 gatewayClient.Close();
             }
         }

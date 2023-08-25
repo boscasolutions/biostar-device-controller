@@ -4,6 +4,7 @@ using Gsdk.Connect;
 using Gsdk.Device;
 using Gsdk.User;
 using System;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -43,7 +44,7 @@ namespace example
             faceSvc = new FaceSvc(gatewayClient.GetChannel());
         }
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             GatewayClient gatewayClient = null;
             UserTest userTest = null;
@@ -57,7 +58,7 @@ namespace example
                 userTest = new UserTest(gatewayClient);
 
                 var connectInfo = new ConnectInfo { IPAddr = DEVICE_ADDR, Port = DEVICE_PORT, UseSSL = USE_SSL };
-                devID = userTest.connectSvc.Connect(connectInfo);
+                devID = await userTest.connectSvc.ConnectAsync(connectInfo);
             }
             catch (RpcException e)
             {
@@ -71,7 +72,7 @@ namespace example
 
             try
             {
-                capability = userTest.deviceSvc.GetCapability(devID);
+                capability = await userTest.deviceSvc.GetCapabilityAsync(devID);
 
                 Console.WriteLine("Device Capability : {0}" + Environment.NewLine, capability);
 
@@ -79,7 +80,7 @@ namespace example
             catch (RpcException e)
             {
                 Console.WriteLine("Cannot get the device info: {0}", e);
-                userTest.connectSvc.Disconnect(devIDs);
+                await userTest.connectSvc.Disconnect(devIDs);
                 gatewayClient.Close();
                 Environment.Exit(1);
             }
@@ -101,8 +102,8 @@ namespace example
 
                 //var newUserID = "13";
 
-                var newUserID = userTest.EnrollUser(devID, capability.ExtendedAuthSupported);
-                new CardTokenTest(userTest.cardSvc, userTest.userSvc).Test(devID, newUserID);
+                var newUserID = (await userTest.EnrollUserAsync(devID, capability.ExtendedAuthSupported));
+                await new CardTokenTest(userTest.cardSvc, userTest.userSvc).TestAsync(devID, newUserID);
                 // new CardTokenTest(userTest.cardSvc, userTest.userSvc).GetUserInfoTest(devID, newUserID);
 
                 //if (capability.CardInputSupported)
@@ -125,7 +126,7 @@ namespace example
 
                 if (capability.FaceInputSupported)
                 {
-                    new FaceTest(userTest.faceSvc, userTest.userSvc).Test(devID, newUserID);
+                    await new FaceTest(userTest.faceSvc, userTest.userSvc).TestAsync(devID, newUserID);
                 }
                 else
                 {
@@ -142,13 +143,14 @@ namespace example
 
                 // userTest.authSvc.SetConfig(devID, origAuthConfig);
             }
-            catch (RpcException e)
+            catch (Exception e)
             {
                 Console.WriteLine("Cannot complete the user test for device {0}: {1}", devID, e);
+                throw;
             }
             finally
             {
-                userTest.connectSvc.Disconnect(devIDs);
+                await userTest.connectSvc.Disconnect(devIDs);
                 gatewayClient.Close();
             }
         }
@@ -162,7 +164,7 @@ namespace example
             return userList.Count.ToString();
         }
 
-        public string EnrollUser(uint deviceID, bool extendedAuthSupported)
+        public async Task<string> EnrollUserAsync(uint deviceID, bool extendedAuthSupported)
         {
             var userList = userSvc.GetList(deviceID);
 
@@ -183,9 +185,9 @@ namespace example
 
             newUser.Setting.EndTime = ToDeviceDateTime(DateTime.UtcNow.AddYears(3));
 
-            userSvc.Enroll(deviceID, new UserInfo[] { newUser });
+            await userSvc.EnrollAsync(deviceID, new UserInfo[] { newUser });
 
-            var newUsers = userSvc.GetUser(deviceID, new string[] { newUserID });
+            var newUsers = await userSvc.GetUserAsync(deviceID, new string[] { newUserID });
             Console.WriteLine(Environment.NewLine + "Test User: {0}" + Environment.NewLine, newUsers[0]);
 
             return newUserID;

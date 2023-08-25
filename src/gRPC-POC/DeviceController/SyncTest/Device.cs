@@ -3,6 +3,7 @@ using Gsdk.Connect;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -26,14 +27,14 @@ namespace example
             connectedIDs = new List<uint>();
         }
 
-        public void ConnectToDevices()
+        public async Task ConnectToDevicesAsync()
         {
             var connInfos = testConfig.GetAsyncConnectInfo();
 
-            connectSvc.AddAsyncConnection(connInfos);
+            await connectSvc.AddAsyncConnectionAsync(connInfos);
         }
 
-        public void DeleteConnection()
+        public async Task DeleteConnectionAsync()
         {
             if (connectedIDs.Count > 0)
             {
@@ -46,11 +47,11 @@ namespace example
             }
         }
 
-        public uint[] GetConnectedDevices(bool refreshList)
+        public async Task<uint[]> GetConnectedDevicesAsync(bool refreshList)
         {
             if (refreshList)
             {
-                var devInfos = connectSvc.GetDeviceList();
+                var devInfos = await connectSvc.GetDeviceListAsync();
                 connectedIDs.Clear();
 
                 foreach (DeviceInfo dev in devInfos)
@@ -65,11 +66,11 @@ namespace example
             return connectedIDs.ToArray();
         }
 
-        public void HandleConnection(ConnectionCallback callback)
+        public async Task HandleConnectionAsync(ConnectionCallback callback)
         {
             connCallback = callback;
 
-            var devStatusStream = connectSvc.Subscribe(STATUS_QUEUE_SIZE);
+            var devStatusStream = await connectSvc.SubscribeAsync(STATUS_QUEUE_SIZE);
 
             cancelToken = new CancellationTokenSource();
 

@@ -3,6 +3,8 @@ using Gsdk.Event;
 using Gsdk.User;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -32,7 +34,7 @@ namespace example
             enrolledIDs = new List<string>();
         }
 
-        public void EnrollUser(string userID)
+        public async Task EnrollUserAsync(string userID)
         {
             uint enrollDeviceID = testConfig.configData.enroll_device.device_id;
 
@@ -51,16 +53,16 @@ namespace example
             userInfo.Cards.Add(cardData.CSNCardData);
 
             UserInfo[] userInfos = { userInfo };
-            userSvc.Enroll(enrollDeviceID, userInfos);
+            await userSvc.EnrollAsync(enrollDeviceID, userInfos);
         }
 
-        public void DeleteUser(string userID)
+        public async Task DeleteUserAsync(string userID)
         {
             string[] userIDs = { userID };
-            userSvc.Delete(testConfig.configData.enroll_device.device_id, userIDs);
+            await userSvc.DeleteAsync(testConfig.configData.enroll_device.device_id, userIDs);
         }
 
-        public RepeatedField<UserInfo> GetNewUser(uint deviceID)
+        public async Task<RepeatedField<UserInfo>> GetNewUserAsync(uint deviceID)
         {
             if (enrolledIDs.Count == 0)
             {
@@ -68,10 +70,10 @@ namespace example
                 return null;
             }
 
-            return userSvc.GetUser(deviceID, enrolledIDs.ToArray());
+            return await userSvc.GetUserAsync(deviceID, enrolledIDs.ToArray());
         }
 
-        public void SyncUser(EventLog eventLog)
+        public async Task SyncUserAsync(EventLog eventLog)
         {
             eventMgr.PrintEvent(eventLog);
 
@@ -81,7 +83,7 @@ namespace example
                 return;
             }
 
-            var connectedIDs = deviceMgr.GetConnectedDevices(false);
+            var connectedIDs = await deviceMgr.GetConnectedDevicesAsync(false);
             var targetDeviceIDs = testConfig.GetTargetDeviceIDs(connectedIDs);
 
             if (targetDeviceIDs.Length == 0)
@@ -95,9 +97,9 @@ namespace example
                 Console.WriteLine("Trying to synchronize the enrolled user {0}...", eventLog.UserID);
 
                 string[] userIDs = { eventLog.UserID };
-                UserInfo[] newUserInfos = { userSvc.GetUser(eventLog.DeviceID, userIDs)[0] };
+                UserInfo[] newUserInfos = { (await userSvc.GetUserAsync(eventLog.DeviceID, userIDs))[0] };
 
-                userSvc.EnrollMulti(targetDeviceIDs, newUserInfos);
+                await userSvc.EnrollMultiAsync(targetDeviceIDs, newUserInfos);
 
                 if (!enrolledIDs.Contains(eventLog.UserID))
                 {
@@ -117,7 +119,7 @@ namespace example
             {
                 Console.WriteLine("Trying to synchronize the deleted user {0}...", eventLog.UserID);
                 string[] userIDs = { eventLog.UserID };
-                userSvc.DeleteMulti(targetDeviceIDs, userIDs);
+                await userSvc.DeleteMultiAsync(targetDeviceIDs, userIDs);
 
                 enrolledIDs.Remove(eventLog.UserID);
             }
