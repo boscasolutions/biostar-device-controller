@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace example
 {
@@ -13,15 +14,15 @@ namespace example
             faceSvc = svc;
         }
 
-        public void Test(uint deviceID)
+        public async Task TestAsync(uint deviceID)
         {
-            var faceConfig = faceSvc.GetConfig(deviceID);
+            var faceConfig = await faceSvc.GetConfigAsync(deviceID);
 
             Console.WriteLine("Face config: {0}" + Environment.NewLine, faceConfig);
 
             Console.WriteLine(">>> Scan a face...");
 
-            var faceData = faceSvc.Scan(deviceID, faceConfig.EnrollThreshold);
+            var faceData = await faceSvc.ScanAsync(deviceID, faceConfig.EnrollThreshold);
 
             for (int i = 0; i < faceData.Templates.Count; i++)
             {

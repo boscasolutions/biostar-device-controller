@@ -13,13 +13,13 @@ namespace example
             userClient = new User.UserClient(channel);
         }
 
-        public RepeatedField<UserHdr> GetList(uint deviceID)
+        public async Task<RepeatedField<UserHdr>> GetListAsync(uint deviceID)
         {
             var request = new GetListRequest { DeviceID = deviceID };
 
             try
             {
-                var response = userClient.GetList(request);
+                var response = await userClient.GetListAsync(request);
 
                 return response.Hdrs;
             }

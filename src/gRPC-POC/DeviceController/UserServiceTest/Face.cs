@@ -23,7 +23,7 @@ namespace example
 
             Console.WriteLine(">> Enroll a unregistered face on the device...");
 
-            FaceData faceData = faceSvc.Scan(deviceID, FaceEnrollThreshold.Bs2FaceEnrollThresholdDefault);
+            FaceData faceData = await faceSvc.ScanAsync(deviceID, FaceEnrollThreshold.Bs2FaceEnrollThresholdDefault);
 
             var userFace = new UserFace { UserID = userID };
             userFace.Faces.Add(faceData);

@@ -143,7 +143,7 @@ namespace example
 
                 if (capabilityInfo.FaceSupported)
                 {
-                    new FaceTest(quickStart.faceSvc).Test(devID);
+                    await new FaceTest(quickStart.faceSvc).TestAsync(devID);
                 }
 
                 if (capabilityInfo.FingerSupported)
@@ -156,7 +156,7 @@ namespace example
                     new CardTest(quickStart.cardSvc).Test(devID, capabilityInfo);
                 }
 
-                new UserTest(quickStart.userSvc, quickStart.fingerSvc, quickStart.faceSvc).TestAsync(devID, capabilityInfo);
+                await new UserTest(quickStart.userSvc, quickStart.fingerSvc, quickStart.faceSvc).TestAsync(devID, capabilityInfo);
                 new EventTest(quickStart.eventSvc).Test(devID);
             }
             catch (RpcException e)
@@ -169,11 +169,11 @@ namespace example
 
                 if (masterMode)
                 {
-                    quickStart.connectMasterSvc.DisconnectAsync(deviceIDs);
+                    await quickStart.connectMasterSvc.DisconnectAsync(deviceIDs);
                 }
                 else
                 {
-                    quickStart.connectSvc.Disconnect(deviceIDs);
+                    await quickStart.connectSvc.Disconnect(deviceIDs);
                 }
 
                 client.Close();

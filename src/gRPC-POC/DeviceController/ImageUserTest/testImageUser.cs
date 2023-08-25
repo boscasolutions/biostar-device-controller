@@ -31,7 +31,7 @@ namespace example
             imageData = File.ReadAllBytes(fileName);
         }
 
-        public ByteString NormalizeImage(uint deviceID, string rawImageFileName)
+        public async Task<ByteString> NormalizeImageAsync(uint deviceID, string rawImageFileName)
         {
             Console.WriteLine("Normalize from {0}, with {1}", deviceID, rawImageFileName);
 
@@ -41,7 +41,7 @@ namespace example
             int imageSize = Buffer.ByteLength(imageData);
             ByteString rawImageData = ByteString.CopyFrom(imageData);
 
-            ByteString warpedImageData = faceSvc.Normalize(deviceID, rawImageData);
+            ByteString warpedImageData = await faceSvc.NormalizeAsync(deviceID, rawImageData);
 
             Console.WriteLine("Normalize completed");
 
@@ -93,11 +93,11 @@ namespace example
             return warpedImageData;
         }
 
-        public string[] GetFaceUserList(uint deviceID)
+        public async Task<string[]> GetFaceUserListAsync(uint deviceID)
         {
             Console.WriteLine("Get user list");
 
-            RepeatedField<UserHdr> userList = userSvc.GetList(deviceID);
+            RepeatedField<UserHdr> userList = await userSvc.GetListAsync(deviceID);
 
             string[] userIDs = new string[userList.Count];
             for (int idx = 0; idx < userList.Count; idx++)

@@ -66,10 +66,10 @@ namespace example
             {
                 TestImageUser testUser = new TestImageUser(faceUserTest.faceSvc, faceUserTest.userSvc);
 
-                ByteString warpedImageData = testUser.NormalizeImage(devID, FACE_UNWARPED_IMAGE);
+                ByteString warpedImageData = await testUser.NormalizeImageAsync(devID, FACE_UNWARPED_IMAGE);
 
                 warpedImageData = await testUser.EnrollFaceUserAsync(devID, warpedImageData, USER_PROFILE_IMAGE);
-                string[] userIDs = testUser.GetFaceUserList(devID);
+                string[] userIDs = await testUser.GetFaceUserListAsync(devID);
                 userIDs = await testUser.GetFaceUsersAsync(devID, userIDs);
             }
             catch (RpcException e)

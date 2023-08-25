@@ -155,9 +155,9 @@ namespace example
             }
         }
 
-        public string GetUsers(uint deviceID)
+        public async Task<string> GetUsersAsync(uint deviceID)
         {
-            var userList = userSvc.GetList(deviceID);
+            var userList = await userSvc.GetListAsync(deviceID);
 
             Console.WriteLine(Environment.NewLine + "Existing User list: {0}" + Environment.NewLine, userList);
 
@@ -166,7 +166,7 @@ namespace example
 
         public async Task<string> EnrollUserAsync(uint deviceID, bool extendedAuthSupported)
         {
-            var userList = userSvc.GetList(deviceID);
+            var userList = await userSvc.GetListAsync(deviceID);
 
             Console.WriteLine(Environment.NewLine + "Existing User list: {0}" + Environment.NewLine, userList);
 

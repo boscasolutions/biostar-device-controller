@@ -24,7 +24,7 @@ namespace example
 
         public async Task TestAsync(uint deviceID, CapabilityInfo capabilityInfo)
         {
-            var userList = userSvc.GetList(deviceID);
+            var userList = await userSvc.GetListAsync(deviceID);
 
             Console.WriteLine("User list: {0}" + Environment.NewLine, userList);
 
@@ -55,7 +55,7 @@ namespace example
 
             await userSvc.EnrollAsync(deviceID, newUsers);
 
-            userList = userSvc.GetList(deviceID);
+            userList = await userSvc.GetListAsync(deviceID);
             Console.WriteLine("User list after enrolling new users: {0}" + Environment.NewLine, userList);
 
             if (capabilityInfo.FingerSupported)
@@ -70,7 +70,7 @@ namespace example
 
             await userSvc.DeleteAsync(deviceID, newUserIDs);
 
-            userList = userSvc.GetList(deviceID);
+            userList = await userSvc.GetListAsync(deviceID);
             Console.WriteLine("User list after deleting new users: {0}" + Environment.NewLine, userList);
         }
 
@@ -115,7 +115,7 @@ namespace example
             userFaces[0] = new UserFace { UserID = userID };
 
             Console.WriteLine(">>> Scan a face for {0}", userID);
-            var faceData = faceSvc.Scan(deviceID, FaceEnrollThreshold.Bs2FaceEnrollThresholdDefault);
+            var faceData = await faceSvc.ScanAsync(deviceID, FaceEnrollThreshold.Bs2FaceEnrollThresholdDefault);
 
             userFaces[0].Faces.Add(faceData);
 
