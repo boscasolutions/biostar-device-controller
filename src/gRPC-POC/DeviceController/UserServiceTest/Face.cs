@@ -26,7 +26,9 @@ namespace example
             FaceData faceData = await faceSvc.ScanAsync(deviceID, FaceEnrollThreshold.Bs2FaceEnrollThresholdDefault);
 
             var userFace = new UserFace { UserID = userID };
+            
             userFace.Faces.Add(faceData);
+
             await userSvc.SetFaceAsync(deviceID, new UserFace[] { userFace });
 
             // save the files for the test:

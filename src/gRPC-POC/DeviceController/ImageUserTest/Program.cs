@@ -9,15 +9,15 @@ namespace example
     class FaceUserTest
     {
         private const string GATEWAY_CA_FILE = "../../../../cert/ca.crt";
-        private const string GATEWAY_ADDR = "192.168.8.98";
+        private const string GATEWAY_ADDR = "localhost";
         private const int GATEWAY_PORT = 4000;
 
-        private const string DEVICE_ADDR = "192.168.8.227";
+        private const string DEVICE_ADDR = "192.168.1.74";
         private const int DEVICE_PORT = 51211;
         private const bool USE_SSL = false;
 
-        private const string CODE_MAP_FILE = "../../event/event_code.json";
-
+        private const string CODE_MAP_FILE = "../../../../DevicesServices/event_code.json";
+ 
         private const string FACE_UNWARPED_IMAGE = "./unwarped.jpg";
         private const string USER_PROFILE_IMAGE = "./profile.jpg";
 
@@ -69,6 +69,7 @@ namespace example
                 ByteString warpedImageData = await testUser.NormalizeImageAsync(devID, FACE_UNWARPED_IMAGE);
 
                 warpedImageData = await testUser.EnrollFaceUserAsync(devID, warpedImageData, USER_PROFILE_IMAGE);
+
                 string[] userIDs = await testUser.GetFaceUserListAsync(devID);
                 userIDs = await testUser.GetFaceUsersAsync(devID, userIDs);
             }

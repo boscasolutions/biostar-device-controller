@@ -30,9 +30,10 @@ namespace example
         // private FingerSvc fingerSvc;
         private FaceSvc faceSvc;
 
-        public UserTest(GatewayClient client)
+        public UserTest()
         {
-            gatewayClient = client;
+            gatewayClient = new GatewayClient();
+            gatewayClient.Connect(GATEWAY_CA_FILE, GATEWAY_ADDR, GATEWAY_PORT);
 
             connectSvc = new ConnectSvc(gatewayClient.GetChannel());
             userSvc = new UserSvc(gatewayClient.GetChannel());
@@ -46,19 +47,21 @@ namespace example
 
         public static async Task Main(string[] args)
         {
-            GatewayClient gatewayClient = null;
-            UserTest userTest = null;
+            var userTest = new UserTest();
+
+                await userTest.RunTest();
+        }
+
+        public async Task RunTest()
+        {
             uint devID = 0;
 
             try
             {
-                gatewayClient = new GatewayClient();
-                gatewayClient.Connect(GATEWAY_CA_FILE, GATEWAY_ADDR, GATEWAY_PORT);
-
-                userTest = new UserTest(gatewayClient);
+                // userTest = new UserTest(gatewayClient);
 
                 var connectInfo = new ConnectInfo { IPAddr = DEVICE_ADDR, Port = DEVICE_PORT, UseSSL = USE_SSL };
-                devID = await userTest.connectSvc.ConnectAsync(connectInfo);
+                devID = await connectSvc.ConnectAsync(connectInfo);
             }
             catch (RpcException e)
             {
@@ -72,7 +75,7 @@ namespace example
 
             try
             {
-                capability = await userTest.deviceSvc.GetCapabilityAsync(devID);
+                capability = await deviceSvc.GetCapabilityAsync(devID);
 
                 Console.WriteLine("Device Capability : {0}" + Environment.NewLine, capability);
 
@@ -80,7 +83,7 @@ namespace example
             catch (RpcException e)
             {
                 Console.WriteLine("Cannot get the device info: {0}", e);
-                await userTest.connectSvc.Disconnect(devIDs);
+                await connectSvc.Disconnect(devIDs);
                 gatewayClient.Close();
                 Environment.Exit(1);
             }
@@ -102,8 +105,8 @@ namespace example
 
                 //var newUserID = "13";
 
-                var newUserID = (await userTest.EnrollUserAsync(devID, capability.ExtendedAuthSupported));
-                await new CardTokenTest(userTest.cardSvc, userTest.userSvc).TestAsync(devID, newUserID);
+                var newUserID = (await EnrollUserAsync(devID, capability.ExtendedAuthSupported));
+                await new CardTokenTest(cardSvc, userSvc).TestAsync(devID, newUserID);
                 // new CardTokenTest(userTest.cardSvc, userTest.userSvc).GetUserInfoTest(devID, newUserID);
 
                 //if (capability.CardInputSupported)
@@ -126,7 +129,7 @@ namespace example
 
                 if (capability.FaceInputSupported)
                 {
-                    await new FaceTest(userTest.faceSvc, userTest.userSvc).TestAsync(devID, newUserID);
+                    await new FaceTest(faceSvc, userSvc).TestAsync(devID, newUserID);
                 }
                 else
                 {
@@ -150,7 +153,7 @@ namespace example
             }
             finally
             {
-                await userTest.connectSvc.Disconnect(devIDs);
+                await connectSvc.Disconnect(devIDs);
                 gatewayClient.Close();
             }
         }
@@ -166,7 +169,7 @@ namespace example
 
         public async Task<string> EnrollUserAsync(uint deviceID, bool extendedAuthSupported)
         {
-            var userList = await userSvc.GetListAsync(deviceID);
+            var userList = userSvc.GetListAsync(deviceID);
 
             Console.WriteLine(Environment.NewLine + "Existing User list: {0}" + Environment.NewLine, userList);
 

@@ -21,22 +21,23 @@ namespace example
             userSvc = uSvc;
         }
 
-        public void setImageData(string fileName, ref byte[] imagedata)
+        public byte[] setImageData(string fileName, byte[] imageData)
         {
-            File.WriteAllBytes(fileName, imagedata);
+            File.WriteAllBytes(fileName, imageData);
+            
+            return imageData;
         }
 
-        public void getImageData(string fileName, out byte[] imageData)
+        public byte[] getImageData(string fileName)
         {
-            imageData = File.ReadAllBytes(fileName);
+            return File.ReadAllBytes(fileName);
         }
 
         public async Task<ByteString> NormalizeImageAsync(uint deviceID, string rawImageFileName)
         {
             Console.WriteLine("Normalize from {0}, with {1}", deviceID, rawImageFileName);
 
-            byte[] imageData;
-            getImageData(rawImageFileName, out imageData);
+            byte[] imageData = getImageData(rawImageFileName);
 
             int imageSize = Buffer.ByteLength(imageData);
             ByteString rawImageData = ByteString.CopyFrom(imageData);
@@ -45,13 +46,13 @@ namespace example
 
             Console.WriteLine("Normalize completed");
 
-            const bool isWriteImage = true;
-            if (isWriteImage)
-            {
-                byte[] data = warpedImageData.ToByteArray();
-                string warpedFileName = FACE_WARPED_IMAGE;
-                setImageData(warpedFileName, ref data);
-            };
+            //const bool isWriteImage = true;
+            //if (isWriteImage)
+            //{
+            //    byte[] data = warpedImageData.ToByteArray();
+            //    string warpedFileName = FACE_WARPED_IMAGE;
+            //    setImageData(warpedFileName, data);
+            //};
 
             return warpedImageData;
         }
@@ -61,7 +62,7 @@ namespace example
             Console.WriteLine("Enroll user");
 
             byte[] profileBytes;
-            getImageData(profileImageFileName, out profileBytes);
+            profileBytes = getImageData(profileImageFileName);
             ByteString profileImage = ByteString.CopyFrom(profileBytes);
 
             string userID10 = "10";
@@ -125,7 +126,7 @@ namespace example
                 {
                     byte[] data = info.Photo.ToByteArray();
                     string userDeviceImage = string.Format("user_image{0}_fromDevice.jpg", info.Hdr.ID);
-                    setImageData(userDeviceImage, ref data);
+                    setImageData(userDeviceImage, data);
                 }
             }
 
@@ -133,4 +134,3 @@ namespace example
         }
     }
 }
-
