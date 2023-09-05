@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace example
 {
-    class Program
+    class FaceUserTest
     {
         private const string GATEWAY_CA_FILE = "../../../../cert/ca.crt";
         private const string GATEWAY_ADDR = "localhost";
@@ -27,7 +27,7 @@ namespace example
         private FaceSvc faceSvc;
         private UserSvc userSvc;
 
-        public Program(GatewayClient client)
+        public FaceUserTest(GatewayClient client)
         {
             gatewayClient = client;
 
@@ -37,11 +37,10 @@ namespace example
             userSvc = new UserSvc(gatewayClient.GetChannel());
         }
 
-        public static async Task Main(string[] args)
+        public static async Task Main_OLD(string[] args)
         {
-            // Connect to device and initialise services
             GatewayClient gatewayClient = null;
-            Program faceUserTest = null;
+            FaceUserTest faceUserTest = null;
             uint devID = 0;
 
             try
@@ -49,7 +48,7 @@ namespace example
                 gatewayClient = new GatewayClient();
                 gatewayClient.Connect(GATEWAY_CA_FILE, GATEWAY_ADDR, GATEWAY_PORT);
 
-                faceUserTest = new Program(gatewayClient);
+                faceUserTest = new FaceUserTest(gatewayClient);
 
                 var connectInfo = new ConnectInfo { IPAddr = DEVICE_ADDR, Port = DEVICE_PORT, UseSSL = USE_SSL };
                 devID = await faceUserTest.connectSvc.ConnectAsync(connectInfo);
@@ -63,24 +62,16 @@ namespace example
 
             uint[] devIDs = { devID };
 
-            // Do the test
             try
             {
-                ApplyUserImageTest applyUserImageTest = new ApplyUserImageTest(faceUserTest.faceSvc, faceUserTest.userSvc);
+                TestImageUser testUser = new TestImageUser(faceUserTest.faceSvc, faceUserTest.userSvc);
 
-                byte[] imageData = applyUserImageTest.getImageData(FACE_UNWARPED_IMAGE);
+                ByteString warpedImageData = await testUser.NormalizeImageAsync(devID, FACE_UNWARPED_IMAGE);
 
-                Console.WriteLine("NormalizeImageAsync");
-                ByteString normalizedImageData = await applyUserImageTest.NormalizeImageAsync(devID, imageData);
+                warpedImageData = await testUser.EnrollFaceUserAsync(devID, warpedImageData, USER_PROFILE_IMAGE);
 
-                byte[] profileBytes = applyUserImageTest.getImageData(USER_PROFILE_IMAGE);
-                
-                Console.WriteLine("EnrollFaceUserAsync");
-                normalizedImageData = await applyUserImageTest.EnrollFaceUserAsync(devID, normalizedImageData, profileBytes);
-
-                string[] userIDs = await applyUserImageTest.GetFaceUserListAsync(devID);
-
-                userIDs = await applyUserImageTest.GetFaceUsersAsync(devID, userIDs);
+                string[] userIDs = await testUser.GetFaceUserListAsync(devID);
+                userIDs = await testUser.GetFaceUsersAsync(devID, userIDs);
             }
             catch (RpcException e)
             {
