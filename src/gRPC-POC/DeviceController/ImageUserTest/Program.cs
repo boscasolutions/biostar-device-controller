@@ -71,16 +71,17 @@ namespace example
                 byte[] imageData = applyUserImageTest.getImageData(FACE_UNWARPED_IMAGE);
 
                 Console.WriteLine("NormalizeImageAsync");
-                ByteString normalizedImageData = await applyUserImageTest.NormalizeImageAsync(devID, imageData);
-
-                byte[] profileBytes = applyUserImageTest.getImageData(USER_PROFILE_IMAGE);
+                bool createProfileImage = true;
+                
+                ByteString normalizedImageData = await applyUserImageTest.NormalizeImageAsync(devID, imageData, USER_PROFILE_IMAGE, createProfileImage);
                 
                 Console.WriteLine("EnrollFaceUserAsync");
-                normalizedImageData = await applyUserImageTest.EnrollFaceUserAsync(devID, normalizedImageData, profileBytes);
+                normalizedImageData = await applyUserImageTest.EnrollFaceUserAsync(devID, normalizedImageData);
 
+                // list the users
                 string[] userIDs = await applyUserImageTest.GetFaceUserListAsync(devID);
 
-                userIDs = await applyUserImageTest.GetFaceUsersAsync(devID, userIDs);
+                userIDs = await applyUserImageTest.ShowFaceUsersListAsync(devID, userIDs);
             }
             catch (RpcException e)
             {

@@ -13,9 +13,6 @@ namespace example
         private FaceSvc faceSvc;
         private UserSvc userSvc;
 
-        private const string FACE_WARPED_IMAGE = "warped.jpg";
-        private const string USER_PROFILE_IMAGE = "./profile.jpg";
-
         public ApplyUserImageTest(FaceSvc fSvc, UserSvc uSvc)
         {
             faceSvc = fSvc;
@@ -24,8 +21,6 @@ namespace example
 
         public byte[] setImageData(string fileName, byte[] imageData)
         {
-            // if(!File.Exists(fileName)) File.Create(fileName);
-
             File.WriteAllBytes(fileName, imageData);
             
             return imageData;
@@ -36,39 +31,35 @@ namespace example
             return File.ReadAllBytes(fileName);
         }
 
-        public async Task<ByteString> NormalizeImageAsync(uint deviceID, byte[] imageData)
+        public async Task<ByteString> NormalizeImageAsync(uint deviceID, byte[] imageData, string profileImageFileName, bool createProfileImage)
         {
             Console.WriteLine("Normalize from device: {0}", deviceID);
 
-            // int imageSize = Buffer.ByteLength(imageData);
             ByteString rawImageData = ByteString.CopyFrom(imageData);
 
             ByteString normalizedImageData = await faceSvc.NormalizeAsync(deviceID, rawImageData);
 
             Console.WriteLine("Normalize completed");
 
-            const bool isWriteImage = true;
-            if (isWriteImage)
+            if (createProfileImage)
             {
                 byte[] data = normalizedImageData.ToByteArray();
-                string warpedFileName = USER_PROFILE_IMAGE;
+                string warpedFileName = profileImageFileName;
                 setImageData(warpedFileName, data);
             };
 
             return normalizedImageData;
         }
 
-        public async Task<ByteString> EnrollFaceUserAsync(uint deviceID, ByteString normalizedImageData, byte[] profileImageBytes)
+        public async Task<ByteString> EnrollFaceUserAsync(uint deviceID, ByteString normalizedImageData)
         {
             Console.WriteLine("Enroll user");
-          
-            ByteString profileImage = ByteString.CopyFrom(profileImageBytes);
-
+            
             string userID10 = "10";
             UserInfo userInfo10 = new UserInfo { Hdr = new UserHdr { ID = userID10 } };
             userInfo10.Name = "testProfileUser";
-            userInfo10.Setting = new UserSetting { StartTime = 978307200, EndTime = 1924991999 };
-            userInfo10.Photo = profileImage;
+            userInfo10.Setting = new UserSetting { StartTime = ToDeviceDateTime(DateTime.UtcNow), EndTime = ToDeviceDateTime(DateTime.UtcNow.AddYears(3))};
+            userInfo10.Photo = normalizedImageData;
 
             FaceData faceData10 = new FaceData();
             faceData10.Flag = (uint)FaceFlag.Bs2FaceFlagEx | (uint)FaceFlag.Bs2FaceFlagWarped;
@@ -98,7 +89,7 @@ namespace example
             return userIDs;
         }
 
-        public async Task<string[]> GetFaceUsersAsync(uint deviceID, string[] userIDs)
+        public async Task<string[]> ShowFaceUsersListAsync(uint deviceID, string[] userIDs)
         {
             Console.WriteLine("Get users");
 
@@ -110,6 +101,7 @@ namespace example
                 Console.WriteLine("Name : {0}", info.Name);
                 Console.WriteLine("NumOfFace : {0}", info.Hdr.NumOfFace);
                 Console.WriteLine("Photo : {0}", info.Photo);
+
                 if (0 < info.Photo.Length)
                 {
                     byte[] data = info.Photo.ToByteArray();
@@ -119,6 +111,14 @@ namespace example
             }
 
             return userIDs;
+        }
+
+        public UInt32 ToDeviceDateTime(DateTime dateTime)
+        {
+            DateTime startTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            TimeSpan currTime = dateTime - startTime;
+
+            return Convert.ToUInt32(Math.Abs(currTime.TotalSeconds));
         }
     }
 }
