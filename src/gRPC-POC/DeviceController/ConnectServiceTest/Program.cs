@@ -8,7 +8,7 @@ namespace example
 {
     class ConnectTest
     {
-        private const string GATEWAY_CA_FILE = "../../../../cert/ca.crt";
+        private const string GATEWAY_CA_FILE = "/cert/ca.crt";
         private const string GATEWAY_ADDR = "localhost";
         private const int GATEWAY_PORT = 4000;
 

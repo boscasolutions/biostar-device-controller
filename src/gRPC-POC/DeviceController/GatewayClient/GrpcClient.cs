@@ -21,7 +21,7 @@ namespace example
     {
         public void Connect(string caFile, string serverAddr, int serverPort)
         {
-            var channelCredentials = new SslCredentials(File.ReadAllText(caFile));
+            var channelCredentials = new SslCredentials(File.ReadAllText(AppContext.BaseDirectory + caFile));
 
             _channel = new Channel(serverAddr, serverPort, channelCredentials);
         }
