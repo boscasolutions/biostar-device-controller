@@ -16,15 +16,15 @@ namespace example
         private const bool USE_SSL = true;
 
         private GatewayClient gatewayClient;
-        private ConnectSvc connectSvc;
-        private EventSvc eventSvc;
+        private ConnectService connectSvc;
+        private EventService eventSvc;
 
         public EventTest(GatewayClient client)
         {
             gatewayClient = client;
 
-            connectSvc = new ConnectSvc(gatewayClient.GetChannel());
-            eventSvc = new EventSvc(gatewayClient.GetChannel());
+            connectSvc = new ConnectService(gatewayClient.GetChannel());
+            eventSvc = new EventService(gatewayClient.GetChannel());
         }
 
         public static async Task Main(string[] args)

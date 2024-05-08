@@ -4,12 +4,12 @@ namespace example
 {
     class DeviceMenu
     {
-        private Menu menu;
-        private ConnectSvc connectSvc;
+        private Menu _menu;
+        private ConnectService _connectService;
 
-        public DeviceMenu(ConnectSvc svc)
+        public DeviceMenu(ConnectService connectService)
         {
-            connectSvc = svc;
+            this._connectService = connectService;
 
             MenuItem[] items = new MenuItem[7];
             items[0] = new MenuItem("1", "Set connection mode", SetConnectionModeAsync, false);
@@ -20,7 +20,7 @@ namespace example
             items[5] = new MenuItem("6", "Refresh the managed device list", ShowDeviceListAsync, false);
             items[6] = new MenuItem("q", "Return to Main Menu", null, true);
 
-            menu = new Menu(items);
+            _menu = new Menu(items);
         }
 
         public async Task ShowAsync()
@@ -31,7 +31,7 @@ namespace example
                 return;
             }
 
-            menu.Show("Device Menu");
+            await _menu.ShowAsync("Device Menu");
         }
 
         public async Task<int> GetDeviceListAsync()
@@ -40,10 +40,12 @@ namespace example
 
             try
             {
-                var devList = await connectSvc.GetDeviceListAsync();
+                var devList = await _connectService.GetDeviceListAsync();
 
                 Console.WriteLine();
+                
                 Console.WriteLine("***** Managed Devices: {0}", devList.Count);
+                
                 for (int i = 0; i < devList.Count; i++)
                 {
                     Console.WriteLine(devList[i]);
@@ -77,9 +79,11 @@ namespace example
             }
 
             Console.Write(">> Select the connection mode (0: Gateway to Device(default), 1: Device to Gateway): ");
+
             string modeStr = Console.ReadLine();
 
             int mode;
+
             if (!Int32.TryParse(modeStr, out mode))
             {
                 Console.Write("Invalid connection mode: {0}", modeStr);
@@ -94,15 +98,13 @@ namespace example
 
             try
             {
-                await connectSvc.SetConnectionModeAsync(deviceIDs, (ConnectionMode)mode);
+                await _connectService.SetConnectionModeAsync(deviceIDs, (ConnectionMode)mode);
             }
             catch (Exception e)
             {
                 Console.WriteLine("Cannot set connection mode: {0}", e);
             }
         }
-
-
 
         public async Task EnableSSLAsync()
         {
@@ -119,7 +121,7 @@ namespace example
 
             try
             {
-                await connectSvc.EnableSSLAsync(deviceIDs);
+                await _connectService.EnableSSLAsync(deviceIDs);
             }
             catch (Exception e)
             {
@@ -142,7 +144,7 @@ namespace example
 
             try
             {
-                await connectSvc.DisableSSLAsync(deviceIDs);
+                await _connectService.DisableSSLAsync(deviceIDs);
             }
             catch (Exception e)
             {
@@ -165,7 +167,7 @@ namespace example
 
             try
             {
-                await connectSvc.Disconnect(deviceIDs);
+                await _connectService.Disconnect(deviceIDs);
             }
             catch (Exception e)
             {
@@ -179,7 +181,7 @@ namespace example
 
             try
             {
-                await connectSvc.DisconnectAllAsync();
+                await _connectService.DisconnectAllAsync();
             }
             catch (Exception e)
             {
@@ -188,5 +190,3 @@ namespace example
         }
     }
 }
-
-

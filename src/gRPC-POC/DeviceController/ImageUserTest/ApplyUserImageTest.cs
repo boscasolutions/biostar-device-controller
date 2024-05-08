@@ -1,8 +1,14 @@
 using Google.Protobuf;
 using Google.Protobuf.Collections;
+using Grpc.Core.Logging;
 using Gsdk.Face;
 using Gsdk.User;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Processing;
 using System;
+using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -41,6 +47,8 @@ namespace example
 
             Console.WriteLine("Normalize completed");
 
+            // System.Drawing.Image
+
             if (createProfileImage)
             {
                 byte[] data = normalizedImageData.ToByteArray();
@@ -59,7 +67,25 @@ namespace example
             UserInfo userInfo10 = new UserInfo { Hdr = new UserHdr { ID = userID10 } };
             userInfo10.Name = "testProfileUser";
             userInfo10.Setting = new UserSetting { StartTime = ToDeviceDateTime(DateTime.UtcNow), EndTime = ToDeviceDateTime(DateTime.UtcNow.AddYears(3))};
-            userInfo10.Photo = normalizedImageData;
+
+            // The maximum size is 16KB
+            if (normalizedImageData != null)
+            {
+                if (normalizedImageData.Length > (16 * 1024))
+                {
+                    Console.WriteLine($"Image is bigger then the maximum size of 16KB allowd for a avatar image size: {normalizedImageData.Length}");
+
+                    userInfo10.Photo = ByteString.CopyFrom(resizeImageData(normalizedImageData.ToByteArray()));
+
+                    Console.WriteLine($"resizedData size: {userInfo10.Photo.Length}");
+                }
+                else
+                {
+                    Console.WriteLine($"Image size: {normalizedImageData.Length}");
+
+                    userInfo10.Photo = normalizedImageData;
+                }
+            }
 
             FaceData faceData10 = new FaceData();
             faceData10.Flag = (uint)FaceFlag.Bs2FaceFlagEx | (uint)FaceFlag.Bs2FaceFlagWarped;
@@ -120,5 +146,52 @@ namespace example
 
             return Convert.ToUInt32(Math.Abs(currTime.TotalSeconds));
         }
+
+        private byte[] resizeImageData(byte[] imageByteData) 
+        {
+            byte[] result;
+            // calculate percentage reduction:
+            int requierdByteSize = (16 * 1024);
+            float imageSize = imageByteData.Length;
+            float percentage = (((float)requierdByteSize / (float)imageSize));
+
+            using (Image image = Image.Load(imageByteData))
+            {
+                // int width = (int)(image.Width * percentage);
+                // int height = (int)(image.Height * percentage);
+
+                image.Mutate(x => x.Resize(image.Width, image.Height));
+                
+                MemoryStream stream = new MemoryStream();
+                image.Save(stream, new JpegEncoder { Quality = 100});
+                result = stream.ToArray();
+            }
+            return result;
+        }
+
+        //private static System.Drawing.Image ResizeImage(System.Drawing.Image imgToResize, Size size)
+        //{
+        //    // Get the image current width
+        //    int sourceWidth = imgToResize.Width;
+        //    // Get the image current height
+        //    int sourceHeight = imgToResize.Height;
+        //    float nPercent = 0;
+        //    float nPercentW = 0;
+        //    float nPercentH = 0;
+        //    // Calculate width and height with new desired size
+        //    nPercentW = ((float)size.Width / (float)sourceWidth);
+        //    nPercentH = ((float)size.Height / (float)sourceHeight);
+        //    nPercent = Math.Min(nPercentW, nPercentH);
+        //    // New Width and Height
+        //    int destWidth = (int)(sourceWidth * nPercent);
+        //    int destHeight = (int)(sourceHeight * nPercent);
+        //    Bitmap b = new Bitmap(destWidth, destHeight);
+        //    Graphics g = Graphics.FromImage((System.Drawing.Image)b);
+        //    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+        //    // Draw image with new width and height
+        //    g.DrawImage(imgToResize, 0, 0, destWidth, destHeight);
+        //    g.Dispose();
+        //    return (System.Drawing.Image)b;
+        //}
     }
 }

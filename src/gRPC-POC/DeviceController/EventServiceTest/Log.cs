@@ -8,20 +8,20 @@ namespace example
         private const int MAX_NUM_EVENT = 32;
         private const string CODE_MAP_FILE = "./event_code.json";
 
-        private EventSvc eventSvc;
+        private EventService _eventService;
         private uint firstEventID;
 
-        public LogTest(EventSvc svc)
+        public LogTest(EventService eventService)
         {
-            eventSvc = svc;
+            _eventService = eventService;
             firstEventID = 0;
         }
 
-        public void Test(uint deviceID)
+        public async void Test(uint deviceID)
         {
-            eventSvc.InitCodeMap(CODE_MAP_FILE);
-            eventSvc.StartMonitoringAsync(deviceID);
-            eventSvc.SetCallback(EventCallback);
+            _eventService.InitCodeMap(CODE_MAP_FILE);
+            await _eventService.StartMonitoringAsync(deviceID);
+            await _eventService.SetCallback(EventCallback);
 
             Console.WriteLine(Environment.NewLine + "===== Event Test =====" + Environment.NewLine);
 
@@ -36,7 +36,7 @@ namespace example
                 Console.WriteLine(Environment.NewLine + ">> Read new events starting from {0}", firstEventID);
             }
 
-            var events = eventSvc.GetLog(deviceID, firstEventID, MAX_NUM_EVENT);
+            var events = await _eventService.GetLogAsync(deviceID, firstEventID, MAX_NUM_EVENT);
 
             for (int i = 0; i < events.Count; i++)
             {
@@ -46,21 +46,23 @@ namespace example
             if (events.Count > 0 && firstEventID != 0)
             {
                 var filter = new EventFilter { EventCode = events[0].EventCode };
+                
                 Console.WriteLine(Environment.NewLine + ">> Filter with event code {0}", filter.EventCode);
 
-                events = eventSvc.GetLogWithFilter(deviceID, firstEventID, MAX_NUM_EVENT, filter);
+                events = await _eventService.GetLogWithFilterAsync(deviceID, firstEventID, MAX_NUM_EVENT, filter);
+                
                 for (int i = 0; i < events.Count; i++)
                 {
                     PrintEvent(events[i]);
                 }
             }
 
-            eventSvc.StopMonitoringAsync(deviceID);
+            await _eventService.StopMonitoringAsync(deviceID);
         }
 
         private void PrintEvent(EventLog logEvent)
         {
-            Console.WriteLine("{0}: Device {1}, User {2}, {3}", DateTimeOffset.FromUnixTimeSeconds(logEvent.Timestamp).UtcDateTime, logEvent.DeviceID, logEvent.UserID, eventSvc.GetEventString(logEvent.EventCode, logEvent.SubCode));
+            Console.WriteLine("{0}: Device {1}, User {2}, {3}", DateTimeOffset.FromUnixTimeSeconds(logEvent.Timestamp).UtcDateTime, logEvent.DeviceID, logEvent.UserID, _eventService.GetEventString(logEvent.EventCode, logEvent.SubCode));
         }
 
         public void EventCallback(EventLog logEvent)

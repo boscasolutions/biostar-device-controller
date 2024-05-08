@@ -7,40 +7,43 @@ namespace example
 {
     public delegate void EventCallback(EventLog logEvent);
 
-    public class EventSvc
+    public class EventService
     {
         private const int MONITORING_QUEUE_SIZE = 8;
 
-        private Event.EventClient eventClient;
-        private CancellationTokenSource cancellationTokenSource;
+        private Event.EventClient _eventClient;
+        private CancellationTokenSource _cancellationTokenSource;
+        private EventCallback _callback;
+        private EventCodeMap _codeMap;
 
-        private EventCallback callback;
-
-        private EventCodeMap codeMap;
-
-        public EventSvc(Channel channel)
+        public EventService(Channel channel)
         {
-            eventClient = new Event.EventClient(channel);
+            _eventClient = new Event.EventClient(channel);
         }
 
         public async Task SetCallback(EventCallback eventCallback)
         {
-            callback = eventCallback;
+            _callback = eventCallback;
+
+            await Task.CompletedTask;
         }
 
-        public RepeatedField<EventLog> GetLog(uint deviceID, uint startEventID, uint maxNumOfLog)
+        public async Task<RepeatedField<EventLog>> GetLogAsync(uint deviceID, uint startEventID, uint maxNumOfLog)
         {
             var request = new GetLogRequest { DeviceID = deviceID, StartEventID = startEventID, MaxNumOfLog = maxNumOfLog };
-            var response = eventClient.GetLog(request);
+
+            var response = await _eventClient.GetLogAsync(request);
 
             return response.Events;
         }
 
-        public RepeatedField<EventLog> GetLogWithFilter(uint deviceID, uint startEventID, uint maxNumOfLog, EventFilter filter)
+        public async Task<RepeatedField<EventLog>> GetLogWithFilterAsync(uint deviceID, uint startEventID, uint maxNumOfLog, EventFilter filter)
         {
             var request = new GetLogWithFilterRequest { DeviceID = deviceID, StartEventID = startEventID, MaxNumOfLog = maxNumOfLog };
+            
             request.Filters.Add(filter);
-            var response = eventClient.GetLogWithFilter(request);
+
+            var response = await _eventClient.GetLogWithFilterAsync(request);
 
             return response.Events;
         }
@@ -48,7 +51,8 @@ namespace example
         public RepeatedField<ImageLog> GetImageLog(uint deviceID, uint startEventID, uint maxNumOfLog)
         {
             var request = new GetImageLogRequest { DeviceID = deviceID, StartEventID = startEventID, MaxNumOfLog = maxNumOfLog };
-            var response = eventClient.GetImageLog(request);
+
+            var response = _eventClient.GetImageLog(request);
 
             return response.ImageEvents;
         }
@@ -58,28 +62,32 @@ namespace example
             try
             {
                 var enableRequest = new EnableMonitoringRequest { DeviceID = deviceID };
-                eventClient.EnableMonitoring(enableRequest);
+             
+                _eventClient.EnableMonitoring(enableRequest);
 
                 var subscribeRequest = new SubscribeRealtimeLogRequest { DeviceIDs = { deviceID }, QueueSize = MONITORING_QUEUE_SIZE };
-                var call = eventClient.SubscribeRealtimeLog(subscribeRequest);
+                
+                var call = _eventClient.SubscribeRealtimeLog(subscribeRequest);
 
-                cancellationTokenSource = new CancellationTokenSource();
+                _cancellationTokenSource = new CancellationTokenSource();
 
-                await ReceiveEvents(this, call.ResponseStream, cancellationTokenSource.Token);
+                await ReceiveEvents(this, call.ResponseStream, _cancellationTokenSource.Token);
             }
             catch (RpcException e)
             {
                 Console.WriteLine("Cannot start monitoring {0}: {1}", deviceID, e);
+                
                 throw;
             }
         }
 
-        public void EnableMonitoring(uint deviceID)
+        public async Task EnableMonitoringAsync(uint deviceID)
         {
             try
             {
                 var enableRequest = new EnableMonitoringRequest { DeviceID = deviceID };
-                eventClient.EnableMonitoring(enableRequest);
+                
+                await _eventClient.EnableMonitoringAsync(enableRequest);
             }
             catch (RpcException e)
             {
@@ -93,15 +101,18 @@ namespace example
             try
             {
                 var enableRequest = new EnableMonitoringMultiRequest { };
+         
                 enableRequest.DeviceIDs.AddRange(deviceIDs);
-                await eventClient.EnableMonitoringMultiAsync(enableRequest);
+                
+                await _eventClient.EnableMonitoringMultiAsync(enableRequest);
 
                 var subscribeRequest = new SubscribeRealtimeLogRequest { DeviceIDs = { deviceIDs }, QueueSize = MONITORING_QUEUE_SIZE };
-                var call = eventClient.SubscribeRealtimeLog(subscribeRequest);
+               
+                var call = _eventClient.SubscribeRealtimeLog(subscribeRequest);
 
-                cancellationTokenSource = new CancellationTokenSource();
+                _cancellationTokenSource = new CancellationTokenSource();
 
-                await ReceiveEvents(this, call.ResponseStream, cancellationTokenSource.Token);
+                await ReceiveEvents(this, call.ResponseStream, _cancellationTokenSource.Token);
             }
             catch (RpcException e)
             {
@@ -115,20 +126,22 @@ namespace example
             try
             {
                 var subscribeRequest = new SubscribeRealtimeLogRequest { QueueSize = MONITORING_QUEUE_SIZE };
-                var call = eventClient.SubscribeRealtimeLog(subscribeRequest);
+                
+                var call = _eventClient.SubscribeRealtimeLog(subscribeRequest);
 
-                cancellationTokenSource = new CancellationTokenSource();
+                _cancellationTokenSource = new CancellationTokenSource();
 
-                await ReceiveEvents(this, call.ResponseStream, cancellationTokenSource.Token);
+                await ReceiveEvents(this, call.ResponseStream, _cancellationTokenSource.Token);
             }
             catch (RpcException e)
             {
                 Console.WriteLine("Cannot start monitoring: {0}", e);
+                
                 throw;
             }
         }
 
-        static async Task ReceiveEvents(EventSvc svc, IAsyncStreamReader<EventLog> stream, CancellationToken token)
+        static async Task ReceiveEvents(EventService svc, IAsyncStreamReader<EventLog> stream, CancellationToken token)
         {
             Console.WriteLine("Start receiving real-time events");
 
@@ -138,9 +151,9 @@ namespace example
                 {
                     var eventLog = stream.Current;
 
-                    if (svc.callback != null)
+                    if (svc._callback != null)
                     {
-                        svc.callback(eventLog);
+                        svc._callback(eventLog);
                     }
                     else
                     {
@@ -168,58 +181,70 @@ namespace example
         public async Task StopMonitoringAsync(uint deviceID)
         {
             var disableRequest = new DisableMonitoringRequest { DeviceID = deviceID };
-            await eventClient.DisableMonitoringAsync(disableRequest);
+            
+            await _eventClient.DisableMonitoringAsync(disableRequest);
 
-            if (cancellationTokenSource != null)
+            if (_cancellationTokenSource != null)
             {
-                cancellationTokenSource.Cancel();
+                _cancellationTokenSource.Cancel();
             }
         }
 
         public async Task StopMonitoringMultiAsync(uint[] deviceIDs)
         {
             var disableRequest = new DisableMonitoringMultiRequest { };
+            
             disableRequest.DeviceIDs.AddRange(deviceIDs);
-            await eventClient.DisableMonitoringMultiAsync(disableRequest);
+            
+            await _eventClient.DisableMonitoringMultiAsync(disableRequest);
 
-            if (cancellationTokenSource != null)
+            if (_cancellationTokenSource != null)
             {
-                cancellationTokenSource.Cancel();
+                _cancellationTokenSource.Cancel();
             }
         }
 
         public async Task DisableMonitoringAsync(uint deviceID)
         {
             var disableRequest = new DisableMonitoringRequest { DeviceID = deviceID };
-            await eventClient.DisableMonitoringAsync(disableRequest);
+            
+            await _eventClient.DisableMonitoringAsync(disableRequest);
         }
 
         public void StopMonitoring()
         {
-            if (cancellationTokenSource != null)
+            if (_cancellationTokenSource != null)
             {
-                cancellationTokenSource.Cancel();
+                _cancellationTokenSource.Cancel();
             }
         }
 
         public void InitCodeMap(string filename)
         {
             var jsonData = File.ReadAllText(filename);
-            codeMap = JsonSerializer.Deserialize<EventCodeMap>(jsonData);
+            
+            if (jsonData == null)
+            {
+                Console.WriteLine($"Cannot read code map file: {filename}");
+            
+                throw new Exception($"Cannot read code map file: {filename}");
+            }
+
+            _codeMap = JsonSerializer.Deserialize<EventCodeMap>(jsonData);
         }
 
         public string GetEventString(uint eventCode, uint subCode)
         {
-            if (codeMap == null)
+            if (_codeMap == null)
             {
                 return string.Format("No code map(0x{0:X})", eventCode | subCode);
             }
 
-            for (int i = 0; i < codeMap.entries.Count; i++)
+            for (int i = 0; i < _codeMap.entries.Count; i++)
             {
-                if (eventCode == codeMap.entries[i].event_code && subCode == codeMap.entries[i].sub_code)
+                if (eventCode == _codeMap.entries[i].event_code && subCode == _codeMap.entries[i].sub_code)
                 {
-                    return codeMap.entries[i].desc;
+                    return _codeMap.entries[i].desc;
                 }
             }
 

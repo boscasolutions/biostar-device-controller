@@ -66,7 +66,7 @@ namespace example
             
             await userSvc.SetCardAsync(deviceID, new UserCard[] { userCard });
 
-            var newUserInfo = await userSvc.GetUserAsync(deviceID, new string[] { userID });            
+            var newUserInfo = await userSvc.GetUserAsync(deviceID, new string[] { userID });
             
             Console.WriteLine("card data:{0}", newUserInfo.FirstOrDefault().Cards[0].Data.ToString());
 

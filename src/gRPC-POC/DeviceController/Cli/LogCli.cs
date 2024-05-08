@@ -9,19 +9,21 @@ namespace example
         private const int MAX_NUM_EVENT = 32;
         private const string CODE_MAP_FILE = "./event_code.json";
 
-        private EventSvc eventSvc;
+        private EventService eventSvc;
         private uint firstEventID;
 
-        public LogCli(EventSvc svc)
+        public LogCli(EventService svc)
         {
             eventSvc = svc;
             firstEventID = 0;
         }
 
-        public async Task EventsLogggerAsync(uint deviceID)
+        public async Task EventsLoggerAsync(uint deviceID)
         {
             eventSvc.InitCodeMap(CODE_MAP_FILE);
+            
             await eventSvc.StartMonitoringAsync(deviceID);
+            
             await eventSvc.SetCallback(EventCallback);
 
             Console.WriteLine(Environment.NewLine + "===== Event Stream =====" + Environment.NewLine);
@@ -37,7 +39,7 @@ namespace example
                 Console.WriteLine(Environment.NewLine + ">> Read new events starting from {0}", firstEventID);
             }
 
-            var events = eventSvc.GetLog(deviceID, firstEventID, MAX_NUM_EVENT);
+            var events = await eventSvc.GetLogAsync(deviceID, firstEventID, MAX_NUM_EVENT);
 
             for (int i = 0; i < events.Count; i++)
             {
@@ -49,7 +51,7 @@ namespace example
                 var filter = new EventFilter { EventCode = events[0].EventCode };
                 Console.WriteLine(Environment.NewLine + ">> Filter with event code {0}", filter.EventCode);
 
-                events = eventSvc.GetLogWithFilter(deviceID, firstEventID, MAX_NUM_EVENT, filter);
+                events = await eventSvc.GetLogWithFilterAsync(deviceID, firstEventID, MAX_NUM_EVENT, filter);
                 for (int i = 0; i < events.Count; i++)
                 {
                     PrintEvent(events[i]);

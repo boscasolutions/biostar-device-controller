@@ -14,24 +14,24 @@ namespace example
 
         private const int STATUS_QUEUE_SIZE = 16;
 
-        private GatewayClient gatewayClient;
-        private ConnectSvc connectSvc;
+        private GatewayClient _gatewayClient;
+        private ConnectService _connectService;
 
-        public ConnectSvc GetConnectSvc()
+        public ConnectService GetConnectService()
         {
-            return connectSvc;
+            return _connectService;
         }
 
         public ConnectTest(GatewayClient client)
         {
-            gatewayClient = client;
+            _gatewayClient = client;
 
-            connectSvc = new ConnectSvc(gatewayClient.GetChannel());
+            _connectService = new ConnectService(_gatewayClient.GetChannel());
         }
 
         public async Task<CancellationTokenSource> SubscribeDeviceStatusAsync()
         {
-            var devStatusStream = await connectSvc.SubscribeAsync(STATUS_QUEUE_SIZE);
+            var devStatusStream = await _connectService.SubscribeAsync(STATUS_QUEUE_SIZE);
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
@@ -43,16 +43,19 @@ namespace example
         public static async Task Main(string[] args)
         {
             var gatewayClient = new GatewayClient();
+
             gatewayClient.Connect(GATEWAY_CA_FILE, GATEWAY_ADDR, GATEWAY_PORT);
 
             var connectTest = new ConnectTest(gatewayClient);
 
             var tokenSource = await connectTest.SubscribeDeviceStatusAsync();
 
-            MainMenu mainMenu = new MainMenu(connectTest.GetConnectSvc());
-            mainMenu.Show();
+            MainMenu mainMenu = new MainMenu(connectTest.GetConnectService());
+            
+            await mainMenu.ShowAsync();
 
             tokenSource.Cancel();
+
             gatewayClient.Close();
         }
 

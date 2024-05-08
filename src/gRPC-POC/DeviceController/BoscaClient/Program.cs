@@ -19,9 +19,9 @@ class ConnectToGrpc
     private const int STATUS_QUEUE_SIZE = 16;
 
     private GatewayClient gatewayClient;
-    private ConnectSvc connectSvc;
+    private ConnectService connectSvc;
 
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         // connect to the gateway
         var gatewayClient = new GatewayClient();
@@ -32,21 +32,18 @@ class ConnectToGrpc
         var connectToGrpc = new ConnectToGrpc(gatewayClient);
 
         // get the gRpc status
-        var tokenSource = connectToGrpc.SubscribeDeviceStatus();
+        var tokenSource = await connectToGrpc.SubscribeDeviceStatusAsync();
 
         // TODO: add more functional stuff here to mimic a process
 
-
-
-
         MainMenu mainMenu = new MainMenu(connectToGrpc.GetConnectSvc());
-        mainMenu.Show();
+        await mainMenu.ShowAsync();
 
         tokenSource.Cancel();
         gatewayClient.Close();
     }
 
-    public ConnectSvc GetConnectSvc()
+    public ConnectService GetConnectSvc()
     {
         return connectSvc;
     }
@@ -55,12 +52,12 @@ class ConnectToGrpc
     {
         gatewayClient = client;
 
-        connectSvc = new ConnectSvc(gatewayClient.GetChannel());
+        connectSvc = new ConnectService(gatewayClient.GetChannel());
     }
 
-    public CancellationTokenSource SubscribeDeviceStatus()
+    public async Task<CancellationTokenSource> SubscribeDeviceStatusAsync()
     {
-        var devStatusStream = connectSvc.Subscribe(STATUS_QUEUE_SIZE);
+        var devStatusStream = await connectSvc.SubscribeAsync(STATUS_QUEUE_SIZE);
 
         CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 

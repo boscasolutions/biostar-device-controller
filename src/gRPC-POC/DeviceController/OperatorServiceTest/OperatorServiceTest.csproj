@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc" Version="1.17.0" />
-    <PackageReference Include="System.Text.Json" Version="4.7.2" />     
+    <PackageReference Include="Grpc" Version="2.46.6" />
+    <PackageReference Include="System.Text.Json" Version="8.0.3" />     
   </ItemGroup>
 
   <ItemGroup>

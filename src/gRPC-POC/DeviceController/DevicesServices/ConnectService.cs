@@ -4,13 +4,13 @@ using Gsdk.Connect;
 
 namespace example
 {
-    public class ConnectSvc
+    public class ConnectService
     {
         private const int SEARCH_TIMEOUT_MS = 5000;
 
         private Connect.ConnectClient connectClient;
 
-        public ConnectSvc(Channel channel)
+        public ConnectService(Channel channel)
         {
             connectClient = new Connect.ConnectClient(channel);
         }
@@ -57,6 +57,7 @@ namespace example
         public async Task AddAsyncConnectionAsync(AsyncConnectInfo[] asyncConns)
         {
             var request = new AddAsyncConnectionRequest { };
+
             request.ConnectInfos.AddRange(asyncConns);
 
             await connectClient.AddAsyncConnectionAsync(request);
@@ -65,6 +66,7 @@ namespace example
         public void DeleteAsyncConnection(uint[] deviceIDs)
         {
             var request = new DeleteAsyncConnectionRequest { };
+
             request.DeviceIDs.AddRange(deviceIDs);
 
             connectClient.DeleteAsyncConnection(request);
@@ -73,6 +75,7 @@ namespace example
         public async Task<RepeatedField<PendingDeviceInfo>> GetPendingListAsync()
         {
             var request = new GetPendingListRequest { };
+
             var response = await connectClient.GetPendingListAsync(request);
 
             return response.DeviceInfos;
@@ -81,6 +84,7 @@ namespace example
         public async Task<AcceptFilter> GetAcceptFilterAsync()
         {
             var request = new GetAcceptFilterRequest { };
+
             var response = await connectClient.GetAcceptFilterAsync(request);
 
             return response.Filter;
@@ -89,6 +93,7 @@ namespace example
         public async Task SetAcceptFilterAsync(AcceptFilter filter)
         {
             var request = new SetAcceptFilterRequest { Filter = filter };
+
             await connectClient.SetAcceptFilterAsync(request);
         }
 
@@ -103,6 +108,7 @@ namespace example
         public async Task EnableSSLAsync(uint[] deviceIDs)
         {
             var request = new EnableSSLMultiRequest { };
+
             request.DeviceIDs.AddRange(deviceIDs);
 
             await connectClient.EnableSSLMultiAsync(request);
@@ -111,6 +117,7 @@ namespace example
         public async Task DisableSSLAsync(uint[] deviceIDs)
         {
             var request = new DisableSSLMultiRequest { };
+
             request.DeviceIDs.AddRange(deviceIDs);
 
             await connectClient.DisableSSLMultiAsync(request);
@@ -119,6 +126,7 @@ namespace example
         public async Task<IAsyncStreamReader<StatusChange>> SubscribeAsync(int queueSize)
         {
             var request = new SubscribeStatusRequest { QueueSize = queueSize };
+
             var streamCall = connectClient.SubscribeStatus(request);
 
             return streamCall.ResponseStream;

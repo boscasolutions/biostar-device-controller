@@ -1,3 +1,4 @@
+using Google.Protobuf.Collections;
 using Grpc.Core;
 using Gsdk.Connect;
 using System.Runtime.CompilerServices;
@@ -6,15 +7,15 @@ namespace example
 {
     public class MainMenu
     {
-        private Menu menu;
-        private ConnectSvc connectSvc;
-        private DeviceMenu deviceMenu;
-        private AsyncMenu asyncMenu;
-        private AcceptMenu acceptMenu;
+        private Menu _menu;
+        private ConnectService _connectService;
+        private DeviceMenu _deviceMenu;
+        private AsyncMenu _asyncMenu;
+        private AcceptMenu _acceptMenu;
         
-        public MainMenu(ConnectSvc svc)
+        public MainMenu(ConnectService connectService)
         {
-            connectSvc = svc;
+            _connectService = connectService;
 
             MenuItem[] items = new MenuItem[7];
             items[0] = new MenuItem("1", "Search devices", SearchDevice, false);
@@ -25,16 +26,18 @@ namespace example
             items[5] = new MenuItem("6", "Events", StreamEventsAsync, false);
             items[6] = new MenuItem("q", "Quit", null, true);
 
-            menu = new Menu(items);
+            _menu = new Menu(items);
 
-            deviceMenu = new DeviceMenu(svc);
-            asyncMenu = new AsyncMenu(svc);
-            acceptMenu = new AcceptMenu(svc);
+            _deviceMenu = new DeviceMenu(connectService);
+            
+            _asyncMenu = new AsyncMenu(connectService);
+            
+            _acceptMenu = new AcceptMenu(connectService);
         }
 
-        public void Show()
+        public async Task ShowAsync()
         {
-            menu.Show("Main Menu");
+            await _menu.ShowAsync("Main Menu");
         }
 
         public async Task SearchDevice()
@@ -43,7 +46,7 @@ namespace example
 
             try
             {
-                var devList = await connectSvc.SearchDeviceAsync();
+                RepeatedField<SearchDeviceInfo> devList = await _connectService.SearchDeviceAsync().ConfigureAwait(false);
 
                 Console.WriteLine();
                 Console.WriteLine("***** Found Devices: {0}", devList.Count);
@@ -70,7 +73,7 @@ namespace example
                 {
                     Console.WriteLine("Connecting to the device...");
 
-                    uint devID = await connectSvc.ConnectAsync(connInfo);
+                    uint devID = await _connectService.ConnectAsync(connInfo);
                     Console.WriteLine("Connected to {0}", devID);
                 }
                 catch (Exception e)
@@ -83,11 +86,11 @@ namespace example
         public async Task StreamEventsAsync()
         {
             var connInfo = GetConnectInfo();
-            uint devID = await connectSvc.ConnectAsync(connInfo);
+            uint devID = await _connectService.ConnectAsync(connInfo);
 
             GatewayClient gatewayClient = new GatewayClient();
             
-            EventSvc eventSvc = new EventSvc(gatewayClient.GetChannel());
+            EventService eventSvc = new EventService(gatewayClient.GetChannel());
 
             uint[] devIDs = { devID };
 
@@ -95,7 +98,7 @@ namespace example
             {
                 LogCli logTest = new LogCli(eventSvc);
 
-                await logTest.EventsLogggerAsync(devID);
+                await logTest.EventsLoggerAsync(devID);
             }
             catch (RpcException e)
             {
@@ -103,24 +106,24 @@ namespace example
             }
             finally
             {
-                await connectSvc.Disconnect(devIDs);
+                await _connectService.Disconnect(devIDs);
                 gatewayClient.Close();
             }
         }
 
         public async Task ShowDeviceMenuAsync()
         {
-            await deviceMenu.ShowAsync();
+            await _deviceMenu.ShowAsync();
         }
 
         public async Task ShowAsyncMenu()
         {
-            await asyncMenu.Show();
+            await _asyncMenu.Show();
         }
 
         public async Task ShowAcceptMenuAsync()
         {
-            await acceptMenu.ShowAsync();
+            await _acceptMenu.ShowAsync();
         }
 
         public static ConnectInfo GetConnectInfo()

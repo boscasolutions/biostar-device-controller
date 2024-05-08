@@ -5,9 +5,9 @@ namespace example
     class AcceptMenu
     {
         private Menu menu;
-        private ConnectSvc connectSvc;
+        private ConnectService connectSvc;
 
-        public AcceptMenu(ConnectSvc svc)
+        public AcceptMenu(ConnectService svc)
         {
             connectSvc = svc;
 
@@ -27,7 +27,7 @@ namespace example
             await ShowAcceptFilterAsync();
             await ShowPendingListAsync();
 
-            menu.Show("Accept Menu");
+            menu.ShowAsync("Accept Menu");
         }
 
         public async Task AddDevicesAsync()

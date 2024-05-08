@@ -44,7 +44,7 @@ namespace example
             items = menuItems;
         }
 
-        public void Show(string title)
+        public async Task ShowAsync(string title)
         {
             while (true)
             {
@@ -68,7 +68,7 @@ namespace example
                     {
                         if (items[i].callback != null)
                         {
-                            items[i].callback();
+                            await items[i].callback();
                         }
 
                         if (items[i].exit)

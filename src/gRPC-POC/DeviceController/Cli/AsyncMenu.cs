@@ -5,9 +5,9 @@ namespace example
     class AsyncMenu
     {
         private Menu menu;
-        private ConnectSvc connectSvc;
+        private ConnectService connectSvc;
 
-        public AsyncMenu(ConnectSvc svc)
+        public AsyncMenu(ConnectService svc)
         {
             connectSvc = svc;
 
@@ -24,7 +24,7 @@ namespace example
         {
             await ShowAsyncConnection();
 
-            menu.Show("Async Menu");
+            menu.ShowAsync("Async Menu");
         }
 
         public async Task ShowAsyncConnection()
