@@ -67,8 +67,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "porto", "porto", "{BF0A8D83
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GatewayClient", "GatewayClient\GatewayClient.csproj", "{9BDC3C54-B49A-4E0F-99E1-E1D966CAC72B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BoscaClient", "BoscaClient\BoscaClient.csproj", "{8AAAE6F2-C9C1-406D-A834-04D829684A03}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DevicesServices", "DevicesServices\DevicesServices.csproj", "{C49C7E22-922C-4317-9D7A-C46DCC6B4690}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConnectServiceTest", "ConnectServiceTest\ConnectServiceTest.csproj", "{125C9B8C-7418-4EF1-A1F7-88F987F07C48}"
@@ -93,10 +91,6 @@ Global
 		{9BDC3C54-B49A-4E0F-99E1-E1D966CAC72B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BDC3C54-B49A-4E0F-99E1-E1D966CAC72B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9BDC3C54-B49A-4E0F-99E1-E1D966CAC72B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8AAAE6F2-C9C1-406D-A834-04D829684A03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8AAAE6F2-C9C1-406D-A834-04D829684A03}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8AAAE6F2-C9C1-406D-A834-04D829684A03}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8AAAE6F2-C9C1-406D-A834-04D829684A03}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C49C7E22-922C-4317-9D7A-C46DCC6B4690}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C49C7E22-922C-4317-9D7A-C46DCC6B4690}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C49C7E22-922C-4317-9D7A-C46DCC6B4690}.Release|Any CPU.ActiveCfg = Release|Any CPU
