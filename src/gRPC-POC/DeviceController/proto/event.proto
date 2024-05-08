@@ -31,6 +31,12 @@ service Event {
   rpc ClearLogMulti(ClearLogMultiRequest) returns (ClearLogMultiResponse);
 }
 
+enum Enum {
+  FIRST_ENUM_VALUE_MUST_BE_ZERO = 0;
+
+  MAX_EVENT_FILTERS = 32;
+}
+
 enum PortValue {
 	OPEN = 0;
 	CLOSED = 1;
