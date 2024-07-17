@@ -349,3 +349,5 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 /src/suprema/gRPC-sdk/csharp_client_sdk_v1.5.2_20230405/
+/pi-release/
+/Test/
