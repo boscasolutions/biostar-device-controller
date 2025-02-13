@@ -3,15 +3,13 @@ using Gsdk.Connect;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace example
 {
     class ConnectTest
     {
-        private const string GATEWAY_CA_FILE = "/cert/ca.crt";
-        private const string GATEWAY_ADDR = "localhost";
-        private const int GATEWAY_PORT = 4000;
-
         private const int STATUS_QUEUE_SIZE = 16;
 
         private GatewayClient _gatewayClient;
@@ -22,11 +20,41 @@ namespace example
             return _connectService;
         }
 
-        public ConnectTest(GatewayClient client)
+        public ConnectTest(GatewayClient client, IConfiguration configuration)
         {
             _gatewayClient = client;
 
             _connectService = new ConnectService(_gatewayClient.GetChannel());
+        }
+
+        public static  async Task Main(string[] args)
+        {
+            IConfiguration configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false)
+                .Build();
+
+            var gatewayAddr = configuration.GetValue<string>("GatewaySettings:Address") ?? "localhost";
+
+            var gatewayPort = configuration.GetValue<int>("GatewaySettings:Port", 4000);
+            
+            var gatewayCaFile = configuration.GetValue<string>("GatewaySettings:CaFile") ?? "/cert/ca.crt";
+            
+            var gatewayClient = new GatewayClient();
+            
+            gatewayClient.Connect(gatewayCaFile, gatewayAddr, gatewayPort);
+
+            var connectTest = new ConnectTest(gatewayClient, configuration);
+
+            var tokenSource = await connectTest.SubscribeDeviceStatusAsync();
+
+            MainMenu mainMenu = new MainMenu(connectTest.GetConnectService());
+            
+            await mainMenu.ShowAsync();
+
+            tokenSource.Cancel();
+
+            gatewayClient.Close();
         }
 
         public async Task<CancellationTokenSource> SubscribeDeviceStatusAsync()
@@ -38,25 +66,6 @@ namespace example
             ReceiveStatus(devStatusStream, cancellationTokenSource.Token);
 
             return cancellationTokenSource;
-        }
-
-        public static async Task Main(string[] args)
-        {
-            var gatewayClient = new GatewayClient();
-
-            gatewayClient.Connect(GATEWAY_CA_FILE, GATEWAY_ADDR, GATEWAY_PORT);
-
-            var connectTest = new ConnectTest(gatewayClient);
-
-            var tokenSource = await connectTest.SubscribeDeviceStatusAsync();
-
-            MainMenu mainMenu = new MainMenu(connectTest.GetConnectService());
-            
-            await mainMenu.ShowAsync();
-
-            tokenSource.Cancel();
-
-            gatewayClient.Close();
         }
 
         static async void ReceiveStatus(IAsyncStreamReader<StatusChange> stream, CancellationToken token)

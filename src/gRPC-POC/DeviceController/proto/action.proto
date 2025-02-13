@@ -59,10 +59,11 @@ message ScheduleTrigger {
 message Trigger {
   uint32 deviceID = 1; // if 0, it will be set to the device itself
   TriggerType type = 2;
+  uint32 ignoreSignalTime = 3;
   oneof entity {
-    EventTrigger event = 3;
-    InputTrigger input = 4;
-    ScheduleTrigger schedule = 5;
+    EventTrigger event = 4;
+    InputTrigger input = 5;
+    ScheduleTrigger schedule = 6;
   }
 }
 
