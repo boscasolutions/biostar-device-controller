@@ -38,6 +38,10 @@ service Card {
   rpc GetCustomConfig(GetCustomConfigRequest) returns (GetCustomConfigResponse);
   rpc SetCustomConfig(SetCustomConfigRequest) returns (SetCustomConfigResponse);
   rpc SetCustomConfigMulti(SetCustomConfigMultiRequest) returns (SetCustomConfigMultiResponse);
+
+  rpc GetFacilityCodeConfig(GetFacilityCodeConfigRequest) returns (GetFacilityCodeConfigResponse);
+  rpc SetFacilityCodeConfig(SetFacilityCodeConfigRequest) returns (SetFacilityCodeConfigResponse);
+  rpc SetFacilityCodeConfigMulti(SetFacilityCodeConfigMultiRequest) returns (SetFacilityCodeConfigMultiResponse);
 }
 
 enum Enum {
@@ -50,6 +54,12 @@ enum Enum {
   FACE_TEMPLATE_SIZE = 552;
 
   MAX_TEMPLATES = 4;
+
+  FACILITY_CODE_SIZE = 4;
+  MAX_FACILITY_CODE = 16;
+
+  MAX_MIFARE_KEY_SIZE_CRYPTO1 = 6;    // Mifare Classic, Mifare Plus EV1 (SL1)
+  MAX_MIFARE_KEY_SIZE_AES128 = 16;    // Mifare Plus EV1 (SL1, SL3)
 }
 
 enum Type {
@@ -194,6 +204,11 @@ enum CardDataType {
 	DATA_BCD		= 3;  
 }
 
+enum MIFARE_ENCRYPTION {
+  MIFARE_ENCRYPTION_CRYPTO1 = 0;
+	MIFARE_ENCRYPTION_AES128 = 1;
+}
+
 message CardConfig {
   CardByteOrder byteOrder = 1;
   bool useWiegandFormat = 2;
@@ -209,6 +224,7 @@ message CardConfig {
 
   bool cipher = 10;
   CardByteOrder smartCardByteOrder = 11;
+  MIFARE_ENCRYPTION mifareEncryption = 12;
 }
 
 message GetConfigRequest {
@@ -417,6 +433,7 @@ message CustomConfig {
   CustomDESFireCard desfire = 4;
   CardByteOrder smartCardByteOrder = 5;
   uint32 formatID = 6;
+  MIFARE_ENCRYPTION mifareEncryption = 7;
 }
 
 message GetCustomConfigRequest {
@@ -441,5 +458,38 @@ message SetCustomConfigMultiRequest {
 }
 
 message SetCustomConfigMultiResponse {
+  repeated err.ErrorResponse deviceErrors = 1;
+}
+
+message FacilityCode {
+  bytes code = 1;                            // 4 bytes
+}
+
+message FacilityCodeConfig {
+  repeated FacilityCode facilityCodes = 1;    // Max 16
+}
+
+message GetFacilityCodeConfigRequest {
+  uint32 deviceID = 1;
+}
+
+message GetFacilityCodeConfigResponse {
+  FacilityCodeConfig config = 1;
+}
+
+message SetFacilityCodeConfigRequest {
+  uint32 deviceID = 1;
+  FacilityCodeConfig config = 2;
+}
+
+message SetFacilityCodeConfigResponse {
+}
+
+message SetFacilityCodeConfigMultiRequest {
+  repeated uint32 deviceIDs = 1;
+  FacilityCodeConfig config = 2;
+}
+
+message SetFacilityCodeConfigMultiResponse {
   repeated err.ErrorResponse deviceErrors = 1;
 }

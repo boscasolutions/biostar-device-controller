@@ -19,7 +19,9 @@ service Event {
   rpc SubscribeRealtimeLog(SubscribeRealtimeLogRequest) returns (stream EventLog); 
 
   rpc GetLog(GetLogRequest) returns (GetLogResponse);
-  rpc GetLogWithFilter(GetLogWithFilterRequest) returns (GetLogWithFilterResponse);
+  rpc GetLogWithFilter(GetLogWithFilterRequest) returns (GetLogWithFilterResponse) {
+    option deprecated = true;
+  };
 
   rpc GetImageLog(GetImageLogRequest) returns (GetImageLogResponse);
 
