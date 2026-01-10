@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Google.Api.CommonProtos" Version="2.2.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.13.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.15.0" />
     <PackageReference Include="Grpc" Version="1.17.0" />
     <PackageReference Include="Grpc.Tools" Version="1.17.0" PrivateAssets="All" />
     <PackageReference Include="System.Text.Json" Version="4.7.2" />  
